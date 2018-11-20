@@ -68,6 +68,7 @@ export default {
 <style scoped>
 div.control {
   display: inline-block;
-  min-width: 100ch;
+  width: 100ch;
+  max-width: 96vw;
 }
 </style>
