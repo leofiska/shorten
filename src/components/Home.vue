@@ -44,9 +44,9 @@ export default {
       original_url: '',
       shorten_url: '',
       s: {
-        shorten: 'Shorten URL',
+        shorten: 'URL Shortener',
         url: 'URL',
-        shorten_url: 'Shorten URL',
+        shorten_url: 'Short URL',
         short: 'Shorten URL',
         description: 'A free service that makes your links shorten with no ads',
         copied: 'link copied'
