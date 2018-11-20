@@ -20,7 +20,7 @@ export default {
   name: 'App',
   data () {
     return {
-      baseUrl: 'azeite.ovh',
+      baseUrl: 'sho.ovh',
       loading: false,
       id: null,
       token: localStorage.getItem('token'),

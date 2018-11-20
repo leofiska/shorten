@@ -17,7 +17,7 @@ export default {
       subscriptions: [],
       loading: false,
       socket: null,
-      url: 'wss://' + this.baseUrl + '/fboard/api',
+      url: 'wss://' + this.baseUrl + '/api',
       createSocket: function () {
         delete this.socket
         this.socket = null
