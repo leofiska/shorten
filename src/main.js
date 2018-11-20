@@ -7,8 +7,10 @@ import router from './router'
 import api from '@/lib/api'
 import 'vue-awesome/icons'
 import Icon from 'vue-awesome/components/Icon'
+import Clipboard from 'v-clipboard'
 
 Vue.use(BootstrapVue)
+Vue.use(Clipboard)
 Vue.component('v-api', api)
 Vue.component('icon', Icon)
 Vue.config.productionTip = false
