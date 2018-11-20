@@ -1,11 +1,21 @@
 <template>
   <div>
-  <h2>{{s.shorten}}</h2>
-  <p>{{s.description}}</p>
-  <form action="#">
-    <input type="text" v-model="original_url" :placeholder="s.url"><br />
-    <input class='btn btn-dark' type="submit" v-on:click.prevent="short_url" :value='s.short' ><br />
-    </form>
+    <h2>{{s.shorten}}</h2>
+    <p>{{s.description}}</p>
+    <div class='control'>
+      <b-input-group :prepend="s.url">
+        <b-form-input v-model="original_url"></b-form-input>
+        <b-input-group-append>
+          <b-btn variant="outline-success" v-on:click.prevent="short_url">{{s.short}}</b-btn>
+        </b-input-group-append>
+      </b-input-group>
+    </div>
+    <br /><br />
+    <div class='control'>
+      <b-input-group :prepend="s.shorten_url">
+        <b-form-input v-model="shorten_url" :readonly="true"></b-form-input>
+      </b-input-group>
+    </div>
   </div>
 </template>
 
@@ -16,12 +26,13 @@ export default {
   data () {
     return {
       original_url: '',
+      shorten_url: '',
       s: {
         shorten: 'Shorten URL',
         url: 'URL',
         shorten_url: 'Shorten URL',
         short: 'Shorten URL',
-        description: 'A free service that makes your links shorten without any tracking and no ads'
+        description: 'A free service that makes your links shorten without tracking or ads'
       },
       items: { tid: -1, loading: true, elements: [] }
     }
@@ -29,7 +40,8 @@ export default {
   props: [
     'title',
     'token',
-    'loading'
+    'loading',
+    'online'
   ],
   mounted () {
     document.title = this.title
@@ -37,21 +49,25 @@ export default {
   methods: {
     short_url: function () {
       this.$emit('setloading', true)
-      this.$emit('fetch', { method: 'shorten', storno: this.storno, context: this, sync: this.items, options: { f: 'join', id: this.original_url } })
-      // this.$router.push('/shorten/?id=' + this.original_url)
+      this.shorten_url = ''
+      this.$emit('fetch', { method: 'shorten', storno: this.storno, context: this, sync: this.items, options: { f: 'create', id: this.original_url } })
     },
     storno (obj) {
       this.$emit('setloading', false)
-      switch (obj.f) {
-        case 'create':
-          if (obj.error !== false) return
-          this.$router.push('/shorten/?id=' + obj.id)
-          break
-      }
+      this.shorten_url = obj.content.id
+    }
+  },
+  watch: {
+    original_url: function (val, oldVal) {
+      this.shorten_url = ''
     }
   }
 }
 </script>
 
 <style scoped>
+div.control {
+  display: inline-block;
+  min-width: 100ch;
+}
 </style>
