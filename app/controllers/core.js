@@ -46,7 +46,7 @@ exports.redirect = ( req, res ) => {
         return;
       }
       var dbo = db.db(database.db);
-      var query = { _id: safeObjectId(req.params.shorten) };
+      var query = { short_url: req.params.shorten };
       dbo.collection('urls').findOne(query, function(err, doc) {
         if (err || doc == null) {
           res.statusCode = 404;

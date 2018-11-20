@@ -5,6 +5,7 @@ var database = require(__dirname + '/../resource/database.js');
 var {ObjectId} = require('mongodb');
 var safeObjectId = s => ObjectId.isValid(s) ? new ObjectId(s) : null;
 var subscribers = [];
+var shortid = require('shortid');
 
 module.exports = {
   process: function(req, ws, obj) {
@@ -72,7 +73,7 @@ function verify_and_create(ws, db, obj) {
           error: false,
           tid: obj.tid,
           content: {
-            id: 'https://'+config.serverName+'/'+doc._id,
+            id: 'https://'+config.serverName+'/'+doc.short_url,
           },
         }));
   });
@@ -80,28 +81,46 @@ function verify_and_create(ws, db, obj) {
 
 function create(ws, db, obj) {
   var dbo = db.db(database.db);
-  var tObj = {
-    creator: safeObjectId(ws.token.stoken_id),
-    url: obj.options.id,
-    time: (new Date())
+
+  var hash = '';
+  var gen = function() {
+    hash = shortid.generate();
+    dbo.collection('stoken')
+      .findOne({ short_url: hash }, function(err, result) {
+        if (err) {
+          ws.send(JSON.stringify({ f: 'create', error: 500, tid: obj.tid }));
+          return;
+        }
+        if (result != null) {
+          gen();
+        } else {
+          var tObj = {
+            creator: safeObjectId(ws.token.stoken_id),
+            url: obj.options.id,
+            time: (new Date()),
+            short_url: hash
+          };
+          dbo.collection('urls')
+            .insertOne(tObj, function(err, result) {
+              if (err) {
+                ws.send(JSON.stringify(
+                 { f: 'create', error: 500, tid: obj.tid }));
+              } else {
+                ws.send(JSON.stringify({
+                    f: 'create',
+                    error: false,
+                    tid: obj.tid,
+                    content: {
+                      id: 'https://'+config.serverName+'/'+tObj.short_url,
+                    },
+                  }));
+              }
+              destroy(db);
+            });
+        }
+      });
   };
-  dbo.collection('urls')
-    .insertOne(tObj, function(err, result) {
-      if (err) {
-        ws.send(JSON.stringify(
-          { f: 'create', error: 500, tid: obj.tid }));
-      } else {
-        ws.send(JSON.stringify({
-            f: 'create',
-            error: false,
-            tid: obj.tid,
-            content: {
-              id: 'https://'+config.serverName+'/'+tObj._id,
-            },
-          }));
-      }
-      destroy(db);
-    });
+  gen();
 }
 
 function notify(obj) {
