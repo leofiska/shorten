@@ -3,6 +3,11 @@ var base = require('../resource/base.js');
 var fs = require('fs');
 var path = require('path');
 var mime = require('mime');
+var database = require(__dirname + '/../resource/database.js');
+/* eslint-disable no-new */
+var {ObjectId} = require('mongodb');
+var safeObjectId = s => ObjectId.isValid(s) ? new ObjectId(s) : null;
+
 const extensions = {
   loadInBrowser: [ 'image', 'video', 'text' ]
 }
@@ -22,7 +27,7 @@ exports.vueresource = ( req , res ) => {
     res.end();
     return;
   }
-  provide_resource(req, res);
+  provide_vueresource(req, res);
 };
 
 exports.redirect = ( req, res ) => {
@@ -32,6 +37,28 @@ exports.redirect = ( req, res ) => {
     res.end();
     return;
   }
+  database.client.connect(database.url, { useNewUrlParser: true },
+    function(err, db) {
+      setTimeout(destroy.bind(this), 30000, db);
+      if (err) {
+        res.statusCode = 500;
+        res.end();
+        return;
+      }
+      var dbo = db.db(database.db);
+      var query = { _id: safeObjectId(req.params.shorten) };
+      dbo.collection('urls').findOne(query, function(err, doc) {
+        if (err || doc == null) {
+          res.statusCode = 404;
+          res.end();
+          return;
+        }
+        res.writeHead(302, {
+          'Location': doc.url
+        });
+        res.end();
+      });
+    });
 };
 
 function provide_vueresource( req, res ) {
@@ -52,6 +79,7 @@ function provide_vueresource( req, res ) {
 };
 
 function provide_resource( req, res ) {
+  console.log('requesting resource: '+file);
   var file = __dirname+'/../../media/'+req.params.folder+'/'+req.params.file;
   fs.exists(file, function(exists) {
     if ( exists ) {
@@ -133,3 +161,10 @@ function provide_file( req, res, file ) {
     });
   });
 }
+function destroy(con) {
+  if (con !== undefined && con !== null) {
+    con.close();
+    con.destroy;
+    con = null;
+  }
+};

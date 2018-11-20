@@ -25,7 +25,7 @@ var setHeader = function(req, res) {
   res.setHeader('x-content-type-options', 'nosniff');
   res.setHeader('x-dns-prefetch-control', 'on');
   res.setHeader('x-download-options', 'noopen');
-  res.setHeader('x-forwarded-host', req.get('host'));
+  // res.setHeader('x-forwarded-host', req.get('host'));
   res.setHeader('x-frame-options', 'DENY');
   res.setHeader('x-permitted-cross-domain-policies', 'none');
   var origin = req.headers.origin;
