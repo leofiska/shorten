@@ -6,7 +6,6 @@
       <Loading v-if="this.loading" :loading="this.loading" />
       <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setloading="loading = $event" />
     </div>
-    {{baseUrl}}
     <Footer />
   </div>
 </template>
