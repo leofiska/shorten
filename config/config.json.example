@@ -1,0 +1,21 @@
+{
+  "serverName": "CHANGE_TO_YOUR_SERVERNAME",
+  "serverListenAddress": "CHANGE_TO_YOUR_IPADDRESS",
+  "serverListenPort": CHANGE_TO_YOUR_PORT,
+  "allowedOrigins": [
+    "ADD_AS_MANY_ORIGINS_AS_YOU_LIKE"
+  ],
+  "allowedDomains": [
+    "ADD_AS_MANY_DOMAIN_AS_YOU_LIKE",
+  ],
+  "certificate": {
+    "key": "CHANGE_TO_RELATIVE_PATH_OF_YOUR_KEY_STARTING_WITH_/",
+    "crt": "CHANGE_TO_RELATIVE_PATH_OF_YOUR_CERTIFICATE_STARTING_WITH_/",
+    "ca": "CHANGE_TO_RELATIVE_PATH_OF_YOUR_CAFILE_STARTING_WITH_/"
+  },
+  "contact": "CHANGE_TO_YOUR_EMAIL",
+  "pin_sha256": [
+    "ADD_THE_PINSHA256_OF_YOUR_CERTIFICATE",
+  ]
+}
+
