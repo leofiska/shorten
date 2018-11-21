@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.8",
+    "@fortawesome/free-brands-svg-icons": "^5.5.0",
+    "@fortawesome/free-regular-svg-icons": "^5.5.0",
     "@fortawesome/free-solid-svg-icons": "^5.5.0",
     "@fortawesome/vue-fontawesome": "^0.1.2",
     "body-parser": "^1.18.3",
@@ -32,6 +34,7 @@
     "spdy": "^4.0.0",
     "v-clipboard": "^2.0.1",
     "vue": "^2.5.2",
+    "vue-lang-code-flags": "^1.0.4",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
     "webpack-cli": "^3.1.2",

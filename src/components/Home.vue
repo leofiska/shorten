@@ -2,24 +2,24 @@
   <div>
     <h2>{{s.shorten}}</h2>
     <p>{{s.description}}</p>
-    <div class='control'>
+    <div class='container text-center text-md-left'>
       <b-input-group :prepend="s.url">
         <b-form-input v-model="original_url" :placeholder="s.type_url"></b-form-input>
         <b-input-group-append>
           <b-button variant="outline-success" v-on:click.prevent="short_url" :disabled="!online">{{s.short}}</b-button>
           <b-button variant="outline-secondary" v-on:click.prevent="clear" :disabled="this.original_url === ''"  v-b-tooltip.hover :title="s.clear_tooltip">
-            <font-awesome-icon icon="trash" />
+            <font-awesome-icon :icon="['fas', 'trash']" />
           </b-button>
         </b-input-group-append>
       </b-input-group>
     </div>
     <br /><br />
-    <div class='control'>
+    <div class='container text-center text-md-left'>
       <b-input-group :prepend="s.short_url">
         <b-form-input v-model="shorten_url" :readonly="true" :disabled="this.shorten_url === ''"></b-form-input>
         <b-input-group-append>
           <b-button variant="outline-primary" :disabled="this.shorten_url === ''" v-clipboard="() => this.shorten_url" v-clipboard:success="clipboardSuccessHandler"  v-b-tooltip.hover :title="s.copy_tooltip">
-            <font-awesome-icon icon="copy" />
+            <font-awesome-icon :icon="['fas', 'copy']" />
           </b-button>
         </b-input-group-append>
       </b-input-group>
@@ -35,7 +35,7 @@
       </b-alert>
     </div>
     <br /><br />
-    <div class='control'>
+    <div class='container text-center text-md-left'>
       <p>{{s.description_1}}</p>
       <br />
       <p>{{s.description_2}}</p>
