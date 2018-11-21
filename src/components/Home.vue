@@ -4,7 +4,7 @@
     <p>{{s.description}}</p>
     <div class='control'>
       <b-input-group :prepend="s.url">
-        <b-form-input v-model="original_url"></b-form-input>
+        <b-form-input v-model="original_url" :placeholder="s.type_url"></b-form-input>
         <b-input-group-append>
           <b-btn variant="outline-success" v-on:click.prevent="short_url" :disabled="!online">{{s.short}}</b-btn>
         </b-input-group-append>
@@ -44,6 +44,7 @@ export default {
       original_url: '',
       shorten_url: '',
       s: {
+        type_url: 'type here the url to simplify',
         shorten: 'URL Shortener',
         url: 'URL',
         shorten_url: 'Short URL',
