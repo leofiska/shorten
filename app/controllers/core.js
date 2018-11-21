@@ -29,9 +29,17 @@ exports.vueresource = ( req , res ) => {
   }
   provide_vueresource(req, res);
 };
+exports.faviconresource = ( req , res ) => {
+  if ( req.header('host') == undefined ) {
+    res.statusCode = 404;
+    res.end();
+    return;
+  }
+  provide_faviconresource(req, res);
+};
 
 exports.redirect = ( req, res ) => {
-  console.log('redirect');
+  console.log('redirect: '+req.params.shorten);
   if ( req.header('host') == undefined ) {
     res.statusCode = 404;
     res.end();
@@ -79,8 +87,22 @@ function provide_vueresource( req, res ) {
 };
 
 function provide_resource( req, res ) {
-  console.log('requesting resource: '+file);
   var file = __dirname+'/../../media/'+req.params.folder+'/'+req.params.file;
+  console.log('requesting resource: '+req.params.folder+'/'+req.params.file);
+  fs.exists(file, function(exists) {
+    if ( exists ) {
+      provide_file( req, res, file );
+    } else {
+      console.log('404');
+      res.statusCode = 404;
+      res.end();
+    }
+  });
+};
+
+function provide_faviconresource( req, res ) {
+  console.log('requesting favicon: '+req.params[0]);
+  var file = __dirname+'/../../media/favicons/'+req.params[0];
   fs.exists(file, function(exists) {
     if ( exists ) {
       provide_file( req, res, file );
@@ -93,7 +115,6 @@ function provide_resource( req, res ) {
 };
 
 function provide_file( req, res, file ) {
-  console.log('encontrou:'+file);
   var ext = path.extname(file).substr(1).toLowerCase();
   var mimeType = mime.getType(file);
   // force download
