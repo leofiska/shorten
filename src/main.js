@@ -13,9 +13,11 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCopy } from '@fortawesome/free-solid-svg-icons'
 // eslint-disable-next-line
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+// eslint-disable-next-line
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faSpinner, faCopy)
+library.add(faSpinner, faCopy, faTrash)
 
 Vue.use(BootstrapVue)
 Vue.use(Clipboard)

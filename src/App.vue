@@ -25,7 +25,7 @@ export default {
       token: localStorage.getItem('token'),
       stoken: sessionStorage.getItem('stoken'),
       online: false,
-      title: 'sho.ovh - URL Shortener',
+      title: 'Light URL Shortener',
       menu: {
         alt: 'sho.ovh'
       }
