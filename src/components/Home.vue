@@ -6,10 +6,10 @@
       <b-input-group :prepend="s.url">
         <b-form-input v-model="original_url" :placeholder="s.type_url"></b-form-input>
         <b-input-group-append>
-          <b-btn variant="outline-success" v-on:click.prevent="short_url" :disabled="!online">{{s.short}}</b-btn>
-          <b-btn variant="outline-secondary" v-on:click.prevent="clear" :disabled="this.original_url === ''"  v-b-tooltip.hover :title="s.clear_tooltip">
+          <b-button variant="outline-success" v-on:click.prevent="short_url" :disabled="!online">{{s.short}}</b-button>
+          <b-button variant="outline-secondary" v-on:click.prevent="clear" :disabled="this.original_url === ''"  v-b-tooltip.hover :title="s.clear_tooltip">
             <font-awesome-icon icon="trash" />
-          </b-btn>
+          </b-button>
         </b-input-group-append>
       </b-input-group>
     </div>
@@ -18,9 +18,9 @@
       <b-input-group :prepend="s.short_url">
         <b-form-input v-model="shorten_url" :readonly="true" :disabled="this.shorten_url === ''"></b-form-input>
         <b-input-group-append>
-          <b-btn variant="outline-primary" :disabled="this.shorten_url === ''" v-clipboard="() => this.shorten_url" v-clipboard:success="clipboardSuccessHandler"  v-b-tooltip.hover :title="s.copy_tooltip">
+          <b-button variant="outline-primary" :disabled="this.shorten_url === ''" v-clipboard="() => this.shorten_url" v-clipboard:success="clipboardSuccessHandler"  v-b-tooltip.hover :title="s.copy_tooltip">
             <font-awesome-icon icon="copy" />
-          </b-btn>
+          </b-button>
         </b-input-group-append>
       </b-input-group>
     </div>
@@ -125,6 +125,8 @@ div.control {
 div.box {
   position: absolute;
   margin-top: 0px;
+  margin-right: 0px;
+  margin-left: 0px;
   display: inline-block;
   max-width: 96vw;
 }
