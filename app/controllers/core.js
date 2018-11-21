@@ -53,7 +53,7 @@ exports.redirect = ( req, res ) => {
           res.end();
           return;
         }
-        res.writeHead(302, {
+        res.writeHead(301, {
           'Location': doc.url
         });
         res.end();
