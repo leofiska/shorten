@@ -14,8 +14,8 @@
     <div class='control'>
       <b-input-group :prepend="s.shorten_url">
         <b-input-group-text slot="append">
-            <icon class='pointer' v-if="this.shorten_url !== ''" name="clipboard" scale="1" v-clipboard="() => this.shorten_url" v-clipboard:success="clipboardSuccessHandler" />
-            <icon v-else name="clipboard" scale="1" />
+            <font-awesome-icon icon="copy" class='pointer' v-if="this.shorten_url !== ''" v-clipboard="() => this.shorten_url" v-clipboard:success="clipboardSuccessHandler" />
+            <font-awesome-icon icon="copy" v-else />
         </b-input-group-text>
         <b-form-input v-model="shorten_url" :readonly="true"></b-form-input>
       </b-input-group>

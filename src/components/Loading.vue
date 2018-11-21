@@ -1,7 +1,7 @@
 <template>
   <div class="loading">
-    <icon name="sync" v-if="!loading" scale="1" />
-    <icon name="sync" spin v-else scale="1" />
+    <font-awesome-icon v-if="!loading" icon="spinner" />
+    <font-awesome-icon v-else icon="spinner" spin />
   </div>
 </template>
 <script>
