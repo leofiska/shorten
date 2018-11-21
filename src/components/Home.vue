@@ -17,7 +17,7 @@
             <font-awesome-icon icon="copy" class='pointer' v-if="this.shorten_url !== ''" v-clipboard="() => this.shorten_url" v-clipboard:success="clipboardSuccessHandler" />
             <font-awesome-icon icon="copy" v-else />
         </b-input-group-text>
-        <b-form-input v-model="shorten_url" :readonly="true"></b-form-input>
+        <b-form-input v-model="shorten_url" :readonly="true" :disabled="this.shorten_url === ''"></b-form-input>
       </b-input-group>
     </div>
     <br />
