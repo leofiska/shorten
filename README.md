@@ -1,6 +1,7 @@
-# shorten
+# Light URL shortener
 
-> Shorten URL Service
+> This is a light weight, free of ads and tracking, URL Shortener using vue.js project.
+> It uses websocket and MongoDB as database
 
 ## Build Setup
 
