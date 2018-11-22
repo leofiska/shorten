@@ -2,7 +2,7 @@
   <div>
     <h2>{{title}}</h2>
     <p>{{s.description}}</p>
-    <div class='container text-center text-md-left'>
+    <div class='container text-center text-md-left position-relative'>
       <b-form @submit="onSubmit">
         <b-input-group>
           <b-form-input v-model="original_url" :placeholder="s.type_url"></b-form-input>
@@ -18,17 +18,19 @@
         </b-input-group>
       </b-form>
     </div>
-    <div class='box'>
-      <b-alert :show="NotFoundDismissCountDown"
-             fade
-             variant="danger"
-             @dismissed="NotFoundDismissCountDown=0"
-             @dismiss-count-down="NotFoundCountDownChanged">
-        <p>{{s.notfound}}</p>
-      </b-alert>
+    <div class='position-absolute text-center w-100' style='color: #ff0000;'>
+      <div class='d-inline-block'>
+        <b-alert :show="NotFoundDismissCountDown"
+               fade
+               variant="transparent"
+               @dismissed="NotFoundDismissCountDown=0"
+               @dismiss-count-down="NotFoundCountDownChanged">
+          <p>{{s.invaliddomain}}</p>
+        </b-alert>
+      </div>
     </div>
     <br /><br />
-    <div class='container text-center text-md-left'>
+    <div class='container text-center text-md-left position-relative'>
       <b-input-group>
         <b-form-input v-model="shorten_url" :placeholder="s.short_url" :readonly="true" :disabled="this.shorten_url === ''"></b-form-input>
         <b-input-group-append>
@@ -41,14 +43,16 @@
         </b-input-group-append>
       </b-input-group>
     </div>
-    <div class='box'>
-      <b-alert :show="dismissCountDown"
-             fade
-             variant="transparent"
-             @dismissed="dismissCountDown=0"
-             @dismiss-count-down="countDownChanged">
-        <p>{{s.copied}}</p>
-      </b-alert>
+    <div class='position-absolute text-center w-100'>
+      <div class='d-inline-block'>
+        <b-alert :show="dismissCountDown"
+               fade
+               variant="transparent"
+               @dismissed="dismissCountDown=0"
+               @dismiss-count-down="countDownChanged">
+          <p>{{s.copied}}</p>
+        </b-alert>
+      </div>
     </div>
     <br /><br />
     <div class='container text-center text-md-left'>
@@ -65,7 +69,7 @@ export default {
   name: 'home',
   data () {
     return {
-      dismissSecs: 1,
+      dismissSecs: 3,
       dismissCountDown: 0,
       NotFoundDismissCountDown: 0,
       original_url: '',
@@ -84,7 +88,7 @@ export default {
             short: 'Shorten URL',
             description: 'simplify your links and share them easily',
             copied: 'link copied',
-            notfound: 'URL Not Found',
+            invaliddomain: 'link is not correct as the domain was not found',
             description_1: 'The service has been started on November 19th, 2018 and it is totally free of charge with no ads and no tracking, as it should be provided forever',
             description_2: 'Suggestions are welcome, please use the e-mail in the footer of the page. New features will continue to be implemented'
           }
@@ -102,7 +106,7 @@ export default {
             short: 'Simplificar URL',
             description: 'simplifique seus links e os compartilhe mais facilmente',
             copied: 'link copiado',
-            notfound: 'URL não encontrada',
+            invaliddomain: 'link não está correto porque o dominio não foi encontrado',
             description_1: 'Este serviço foi iniciado em 19 de novembro de 2018 e é totalmente gratuito, livre de anúncios e rastreios, como deve permenecer para sempre',
             description_2: 'Sugestões são bem-vindas!! Utilize o e-mail que está no rodapé da página para fazê-las. Novas facilidades continuarão a ser implementadas'
           }
@@ -152,6 +156,8 @@ export default {
     short_url: function () {
       this.$emit('setloading', true)
       this.shorten_url = ''
+      this.dismissCountDown = 0
+      this.NotFoundDismissCountDown = 0
       this.$emit('fetch', { method: 'shorten', storno: this.storno, context: this, sync: this.items, options: { f: 'create', id: this.original_url } })
     },
     storno (obj) {
@@ -197,11 +203,6 @@ div.control {
   max-width: 96vw;
 }
 div.box {
-  position: absolute;
-  margin-top: 0px;
-  margin-right: 0px;
-  margin-left: 0px;
-  display: inline-block;
-  max-width: 96vw;
+  width: 100vw;
 }
 </style>
