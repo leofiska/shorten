@@ -141,7 +141,7 @@ export default {
       this.original_url = ''
     },
     clipboardSuccessHandler: function () {
-      this.NotFoundDismissCountDown = this.dismissSecs
+      this.dismissCountDown = this.dismissSecs
     },
     NotFoundCountDownChanged (dismissCountDown) {
       this.NotFoundDismissCountDown = dismissCountDown
