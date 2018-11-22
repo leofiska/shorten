@@ -3,18 +3,20 @@
     <h2>{{title}}</h2>
     <p>{{s.description}}</p>
     <div class='container text-center text-md-left'>
-      <b-input-group>
-        <b-form-input v-model="original_url" :placeholder="s.type_url"></b-form-input>
-        <b-input-group-append>
-          <b-button variant="outline-success" @click="short_url" :disabled="!online">{{s.short}}</b-button>
-          <b-button v-if="this.original_url === ''" variant="outline-secondary" :disabled="true">
-            <font-awesome-icon :icon="['fas', 'trash']" />
-          </b-button>
-          <b-button v-else variant="outline-secondary" v-on:click.prevent="clear" v-b-tooltip="s.clear_tooltip">
-            <font-awesome-icon :icon="['fas', 'trash']" />
-          </b-button>
-        </b-input-group-append>
-      </b-input-group>
+      <b-form @submit="onSubmit">
+        <b-input-group>
+          <b-form-input v-model="original_url" :placeholder="s.type_url"></b-form-input>
+          <b-input-group-append>
+            <b-button variant="outline-success" :disabled="!online" type="submit">{{s.short}}</b-button>
+            <b-button v-if="this.original_url === ''" variant="outline-secondary" :disabled="true">
+              <font-awesome-icon :icon="['fas', 'trash']" />
+            </b-button>
+            <b-button v-else variant="outline-secondary" v-on:click.prevent="clear" v-b-tooltip="s.clear_tooltip">
+              <font-awesome-icon :icon="['fas', 'trash']" />
+            </b-button>
+          </b-input-group-append>
+        </b-input-group>
+      </b-form>
     </div>
     <div class='box'>
       <b-alert :show="NotFoundDismissCountDown"
@@ -30,7 +32,7 @@
       <b-input-group>
         <b-form-input v-model="shorten_url" :placeholder="s.short_url" :readonly="true" :disabled="this.shorten_url === ''"></b-form-input>
         <b-input-group-append>
-          <b-button variant="outline-primary" v-if="this.shorten_url === ''" :disabled="true">
+          <b-button ariant="outline-primary" v-if="this.shorten_url === ''" :disabled="true">
             <font-awesome-icon :icon="['fas', 'copy']" />
           </b-button>
           <b-button variant="outline-primary" v-else v-clipboard="() => this.shorten_url" v-clipboard:success="clipboardSuccessHandler"  v-b-tooltip="s.copy_tooltip">
@@ -131,6 +133,10 @@ export default {
     this.s = this.sentences[0].content
   },
   methods: {
+    onSubmit (evt) {
+      evt.preventDefault()
+      this.short_url()
+    },
     clear: function () {
       this.original_url = ''
     },

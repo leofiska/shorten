@@ -15,6 +15,7 @@ import bNavItemDropDown from 'bootstrap-vue/es/components/nav/nav-item-dropdown'
 import bNavbar from 'bootstrap-vue/es/components/navbar/navbar'
 import bNavbarBrand from 'bootstrap-vue/es/components/navbar/navbar-brand'
 import bButton from 'bootstrap-vue/es/components/button/button'
+import bForm from 'bootstrap-vue/es/components/form/form'
 import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
 import bInputGroup from 'bootstrap-vue/es/components/input-group/input-group'
 import bInputGroupAppend from 'bootstrap-vue/es/components/input-group/input-group-append'
@@ -34,6 +35,7 @@ Vue.component('b-nav-item-dropdown', bNavItemDropDown)
 Vue.component('b-navbar', bNavbar)
 Vue.component('b-navbar-brand', bNavbarBrand)
 Vue.component('b-button', bButton)
+Vue.component('b-form', bForm)
 Vue.component('b-form-input', bFormInput)
 Vue.component('b-input-group', bInputGroup)
 Vue.component('b-input-group-append', bInputGroupAppend)
