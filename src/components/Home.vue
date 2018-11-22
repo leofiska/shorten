@@ -6,7 +6,7 @@
       <b-input-group>
         <b-form-input v-model="original_url" :placeholder="s.type_url"></b-form-input>
         <b-input-group-append>
-          <b-button variant="outline-success" v-on:click.prevent="short_url" :disabled="!online">{{s.short}}</b-button>
+          <b-button variant="outline-success" @click="short_url" :disabled="!online">{{s.short}}</b-button>
           <b-button v-if="this.original_url === ''" variant="outline-secondary" :disabled="true">
             <font-awesome-icon :icon="['fas', 'trash']" />
           </b-button>
@@ -15,6 +15,15 @@
           </b-button>
         </b-input-group-append>
       </b-input-group>
+    </div>
+    <div class='box'>
+      <b-alert :show="NotFoundDismissCountDown"
+             fade
+             variant="danger"
+             @dismissed="NotFoundDismissCountDown=0"
+             @dismiss-count-down="NotFoundCountDownChanged">
+        <p>{{s.notfound}}</p>
+      </b-alert>
     </div>
     <br /><br />
     <div class='container text-center text-md-left'>
@@ -30,7 +39,6 @@
         </b-input-group-append>
       </b-input-group>
     </div>
-    <br />
     <div class='box'>
       <b-alert :show="dismissCountDown"
              fade
@@ -57,6 +65,7 @@ export default {
     return {
       dismissSecs: 1,
       dismissCountDown: 0,
+      NotFoundDismissCountDown: 0,
       original_url: '',
       shorten_url: '',
       sentences: [
@@ -73,6 +82,7 @@ export default {
             short: 'Shorten URL',
             description: 'simplify your links and share them easily',
             copied: 'link copied',
+            notfound: 'URL Not Found',
             description_1: 'The service has been started on November 19th, 2018 and it is totally free of charge with no ads and no tracking, as it should be provided forever',
             description_2: 'Suggestions are welcome, please use the e-mail in the footer of the page. New features will continue to be implemented'
           }
@@ -90,6 +100,7 @@ export default {
             short: 'Simplificar URL',
             description: 'simplifique seus links e os compartilhe mais facilmente',
             copied: 'link copiado',
+            notfound: 'URL não encontrada',
             description_1: 'Este serviço foi iniciado em 19 de novembro de 2018 e é totalmente gratuito, livre de anúncios e rastreios, como deve permenecer para sempre',
             description_2: 'Sugestões são bem-vindas!! Utilize o e-mail que está no rodapé da página para fazê-las. Novas facilidades continuarão a ser implementadas'
           }
@@ -123,21 +134,14 @@ export default {
     clear: function () {
       this.original_url = ''
     },
-    copy_url: function () {
-      console.log('copying')
-      if (this.shorten_url.trim() !== '') {
-        this.showAlert()
-        this.$clipboard(this.shorten_url)
-      }
-    },
     clipboardSuccessHandler: function () {
-      this.showAlert()
+      this.NotFoundDismissCountDown = this.dismissSecs
+    },
+    NotFoundCountDownChanged (dismissCountDown) {
+      this.NotFoundDismissCountDown = dismissCountDown
     },
     countDownChanged (dismissCountDown) {
       this.dismissCountDown = dismissCountDown
-    },
-    showAlert () {
-      this.dismissCountDown = this.dismissSecs
     },
     short_url: function () {
       this.$emit('setloading', true)
@@ -146,7 +150,15 @@ export default {
     },
     storno (obj) {
       this.$emit('setloading', false)
-      this.shorten_url = obj.content.id
+      if (obj.error === false) {
+        this.shorten_url = obj.content.id
+        return
+      }
+      switch (obj.error) {
+        case 404:
+          this.NotFoundDismissCountDown = this.dismissSecs
+          break
+      }
     }
   },
   watch: {
