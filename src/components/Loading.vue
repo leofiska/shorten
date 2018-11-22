@@ -1,5 +1,5 @@
 <template>
-  <div class="loading">
+  <div class='loading text-center align-top'>
     <font-awesome-icon v-if="!loading" icon="spinner" />
     <font-awesome-icon v-else icon="spinner" spin />
   </div>
@@ -22,10 +22,8 @@ export default {
   user-select:none;
 }
 div.loading {
-  position: absolute;
-  top: 0rem;
-  left: 0;
-  right: 0;
-  display: inline-block;
+  position: fixed;
+  width: 100vw;
+  z-index: 40000;
 }
 </style>
