@@ -1,6 +1,6 @@
 <template>
-  <b-dropdown id='ddown-dropup' :text="this.s.language" variant='transparent' class='m-2'>
-    <b-dropdown-item v-for="l in languages" href="#" :key="l.alias" v-on:click.prevent="change_language(l.alias)">{{l.name}}</b-dropdown-item>
+  <b-dropdown :text="this.s.language" variant='transparent' class='m-2'>
+    <b-dropdown-item v-for="l in languages" href="#" :key="l.alias" :id="'lang' + l.alias" v-on:click.prevent="change_language(l.alias)">{{l.name}}</b-dropdown-item>
   </b-dropdown>
 </template>
 
@@ -27,8 +27,7 @@ export default {
     if (l !== null && l !== undefined) {
       for (i = 0; this.languages[i] !== undefined; i++) {
         if (this.languages[i].alias === l) {
-          this.s.language = this.languages[i].name
-          this.$emit('setlanguage', l)
+          this.change_language(this.languages[i].alias)
           return
         }
       }
@@ -37,21 +36,24 @@ export default {
       l = navigator.language.toLowerCase()
       for (i = 0; this.languages[i] !== undefined; i++) {
         if (this.languages[i].alias === l) {
-          this.s.language = this.languages[i].name
-          this.$emit('setlanguage', l)
+          this.change_language(this.languages[i].alias)
           return
         }
       }
-      localStorage.setItem('language', 'en-us')
+      this.change_language('en-us')
     }
   },
   methods: {
     change_language: function (nl) {
+      var el = document.getElementById('lang' + this.language)
+      if (el) el.style.display = ''
       this.$emit('setlanguage', nl)
       localStorage.setItem('language', nl)
       for (var i = 0; this.languages[i] !== undefined; i++) {
         if (this.languages[i].alias === nl) {
           this.s.language = this.languages[i].name
+          el = document.getElementById('lang' + nl)
+          if (el) el.style.display = 'none'
           return
         }
       }
