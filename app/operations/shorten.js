@@ -1,11 +1,12 @@
 'use strict';
 var config = require('../../config/config.json');
 var database = require(__dirname + '/../resource/database.js');
+var shortid = require('shortid');
+var dns = require('dns');
 /* eslint-disable no-new */
 var {ObjectId} = require('mongodb');
 var safeObjectId = s => ObjectId.isValid(s) ? new ObjectId(s) : null;
 var subscribers = [];
-var shortid = require('shortid');
 
 module.exports = {
   process: function(req, ws, obj) {
@@ -57,7 +58,6 @@ function verify_and_create(ws, db, obj) {
     par.splice(0,1);
     obj.options.id += par.join('/');
   }
-
   var tObj = {
     creator: safeObjectId(ws.token.stoken_id),
     url: obj.options.id
@@ -81,46 +81,52 @@ function verify_and_create(ws, db, obj) {
 
 function create(ws, db, obj) {
   var dbo = db.db(database.db);
-
-  var hash = '';
-  var gen = function() {
-    hash = shortid.generate();
-    dbo.collection('stoken')
-      .findOne({ short_url: hash }, function(err, result) {
-        if (err) {
-          ws.send(JSON.stringify({ f: 'create', error: 500, tid: obj.tid }));
-          return;
-        }
-        if (result != null) {
-          gen();
-        } else {
-          var tObj = {
-            creator: safeObjectId(ws.token.stoken_id),
-            url: obj.options.id,
-            time: (new Date()),
-            short_url: hash
-          };
-          dbo.collection('urls')
-            .insertOne(tObj, function(err, result) {
-              if (err) {
-                ws.send(JSON.stringify(
-                 { f: 'create', error: 500, tid: obj.tid }));
-              } else {
-                ws.send(JSON.stringify({
-                    f: 'create',
-                    error: false,
-                    tid: obj.tid,
-                    content: {
-                      id: 'https://'+config.serverName+'/'+tObj.short_url,
-                    },
-                  }));
-              }
-              destroy(db);
-            });
-        }
-      });
-  };
-  gen();
+  var par = obj.options.id.split(/'?\/'?/).filter(function(v) { return v; });
+  dns.lookup(par[1], (err, addresses, family) => {  
+    if (addresses === undefined ) {
+      ws.send(JSON.stringify({ f: 'create', error: 404, tid: obj.tid }));
+      return;
+    }
+    var hash = '';
+    var gen = function() {
+      hash = shortid.generate();
+      dbo.collection('stoken')
+        .findOne({ short_url: hash }, function(err, result) {
+          if (err) {
+            ws.send(JSON.stringify({ f: 'create', error: 500, tid: obj.tid }));
+            return;
+          }
+          if (result != null) {
+            gen();
+          } else {
+            var tObj = {
+              creator: safeObjectId(ws.token.stoken_id),
+              url: obj.options.id,
+              time: (new Date()),
+              short_url: hash
+            };
+            dbo.collection('urls')
+              .insertOne(tObj, function(err, result) {
+                if (err) {
+                   ws.send(JSON.stringify(
+                   { f: 'create', error: 500, tid: obj.tid }));
+                } else {
+                  ws.send(JSON.stringify({
+                      f: 'create',
+                      error: false,
+                      tid: obj.tid,
+                      content: {
+                        id: 'https://'+config.serverName+'/'+tObj.short_url,
+                      },
+                    }));
+                }
+                destroy(db);
+              });
+          }
+        });
+    };
+    gen();
+  });
 }
 
 function notify(obj) {
