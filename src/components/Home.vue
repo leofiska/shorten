@@ -83,15 +83,15 @@ export default {
           {
             clear_tooltip: 'limpar tudo',
             copy_tooltip: 'copia url simplificada para área de transferência',
-            type_url: 'digita a url aqui',
+            type_url: 'digite aqui a url',
             shorten: 'Light URL Shortener',
             url: 'URL',
             short_url: 'URL Simplificada',
             short: 'Simplificar URL',
             description: 'simplifique seus links e os compartilhe mais facilmente',
             copied: 'link copiado',
-            description_1: 'Este serviço foi iniciado em 19 de novembro de 2018 and é totalmente gratuito e livre de anúncios e rastreios, como deve permenecer para sempre',
-            description_2: 'Sugestões são bem-vindas, utilize o e-mail que está no rodapé da página. Novas facilidades continuarão a ser implementadas'
+            description_1: 'Este serviço foi iniciado em 19 de novembro de 2018 e é totalmente gratuito, livre de anúncios e rastreios, como deve permenecer para sempre',
+            description_2: 'Sugestões são bem-vindas!! Utilize o e-mail que está no rodapé da página para fazê-las. Novas facilidades continuarão a ser implementadas'
           }
         }
       ],

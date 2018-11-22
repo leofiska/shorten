@@ -101,7 +101,6 @@ export default {
       for (var i = 0; this.sentences[i] !== undefined; i++) {
         if (this.sentences[i].alias === newVal) {
           this.s = this.sentences[i].content
-          console.log(JSON.stringify(this.s))
           break
         }
       }
