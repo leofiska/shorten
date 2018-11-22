@@ -1,12 +1,12 @@
 <template>
   <div>
-    <v-api ref='api' :baseUrl="baseUrl" :id="id" @setid="id = $event" :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :default_language="default_language" language="language" />
-    <Navigator :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :default_language="default_language" language="language" />
+    <v-api ref='api' :baseUrl="baseUrl" :id="id" @setid="id = $event" :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :language="language" />
+    <Navigator :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" />
     <div id="app">
-      <Loading v-if="this.loading" :loading="this.loading" :default_language="default_language" language="language" />
-      <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setloading="loading = $event" :default_language="default_language" language="language" />
+      <Loading v-if="this.loading" :loading="this.loading" language="language" />
+      <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setloading="loading = $event"  language="language" />
     </div>
-    <Footer :default_language="default_language" language="language" />
+    <Footer :language="language" @setlanguage="language = $event"/>
   </div>
 </template>
 
@@ -26,8 +26,7 @@ export default {
       stoken: sessionStorage.getItem('stoken'),
       online: false,
       title: 'Light URL Shortener',
-      default_language: navigator.language,
-      language: navigator.language,
+      language: navigator.language.toLowerCase(),
       menu: {
         alt: 'sho.ovh',
         img: {
@@ -45,6 +44,9 @@ export default {
     Loading
   },
   methods: {
+    setlanguage (nl) {
+      this.language = nl
+    },
     fetch (request) {
       this.$refs.api.fetch(request)
     },

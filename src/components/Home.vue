@@ -21,7 +21,7 @@
       <b-input-group>
         <b-form-input v-model="shorten_url" :placeholder="s.short_url" :readonly="true" :disabled="this.shorten_url === ''"></b-form-input>
         <b-input-group-append>
-          <b-button variant="outline-primary" v-if="this.shorten_url === ''" disabled="true">
+          <b-button variant="outline-primary" v-if="this.shorten_url === ''" :disabled="true">
             <font-awesome-icon :icon="['fas', 'copy']" />
           </b-button>
           <b-button variant="outline-primary" v-else v-clipboard="() => this.shorten_url" v-clipboard:success="clipboardSuccessHandler"  v-b-tooltip="s.copy_tooltip">
@@ -80,7 +80,6 @@ export default {
     'token',
     'loading',
     'online',
-    'default_language',
     'language'
   ],
   mounted () {

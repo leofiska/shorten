@@ -22,9 +22,7 @@
           <div class='col-md-3 mx-auto'>
             <h5 class="font-weight-bold mt-3 mb-4">Language</h5>
             <div class='d-inline-block text-center'>
-              <b-dropdown id='ddown-dropup' text='English (United States)' variant='transparent' class='m-2'>
-                <b-dropdown-item href="#">Português (Brazil)</b-dropdown-item>
-              </b-dropdown>
+              <Language :language="language" @setlanguage="setlanguage" />
             </div>
           </div>
         </div>
@@ -43,21 +41,34 @@
 </template>
 
 <script>
+import Language from '@/components/Language.vue'
 
 export default {
   name: 'user',
+  components: {
+    Language
+  },
   data () {
     return {
-      domain: 'vue'
+      domain: 'vue',
+      s: {
+        language: 'English (United States)'
+      },
+      languages: [
+        { alias: 'en-us', name: 'English (United Stated)', international: 'English (United States)' },
+        { alias: 'pt-br', name: 'Português (Brasil)', international: 'Portuguese (Brazil)' }
+      ]
     }
   },
   props: [
-    'default_language',
     'language'
   ],
   mounted () {
   },
   methods: {
+    setlanguage: function (nl) {
+      this.$emit('setlanguage', nl)
+    }
   },
   computed: {
   }
