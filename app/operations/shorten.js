@@ -82,6 +82,9 @@ function verify_and_create(ws, db, obj) {
 function create(ws, db, obj) {
   var dbo = db.db(database.db);
   var par = obj.options.id.split(/'?\/'?/).filter(function(v) { return v; });
+  if ( par[1].indexOf(':') != -1 ) {
+    par[1] = par[1].substr(0,par[1].indexOf(':'));
+  }
   dns.lookup(par[1], (err, addresses, family) => {  
     if (addresses === undefined ) {
       ws.send(JSON.stringify({ f: 'create', error: 404, tid: obj.tid }));
