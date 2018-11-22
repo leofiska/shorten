@@ -3,11 +3,11 @@
     <b-dropdown-item v-for="l in languages" href="#" :key="l.alias" v-on:click.prevent="change_language(l.alias)">{{l.name}}</b-dropdown-item>
   </b-dropdown>
 </template>
+
 <script>
 export default {
   name: 'language',
   props: [
-    'default_language',
     'language'
   ],
   data () {
@@ -61,4 +61,11 @@ export default {
 </script>
 
 <style scoped>
+* {
+  -webkit-user-select:none;
+  -khtml-user-select:none;
+  -moz-user-select:none;
+  -o-user-select:none;
+  user-select:none;
+}
 </style>
