@@ -51,6 +51,10 @@ export default {
       domain: 'vue'
     }
   },
+  props: [
+    'default_language',
+    'language'
+  ],
   mounted () {
   },
   methods: {

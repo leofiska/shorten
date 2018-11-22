@@ -1,6 +1,6 @@
 <template>
   <b-navbar type="light" variant="light" :sticky="true">
-    <b-navbar-brand v-if="this.menu.img" to="/"><img :alt="this.menu.alt" :src="'https://'+this.baseUrl+this.menu.img.src" /></b-navbar-brand>
+    <b-navbar-brand v-if="this.menu.img" to="/"><img :alt="this.menu.alt" :src="'https://'+this.baseUrl+'/'+this.menu.img.src" /></b-navbar-brand>
     <b-navbar-brand v-else to="/">{{this.menu.alt}}</b-navbar-brand>
   </b-navbar>
 </template>

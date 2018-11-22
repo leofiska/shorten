@@ -1,12 +1,12 @@
 <template>
   <div>
-    <v-api ref='api' :baseUrl="baseUrl" :id="id" @setid="id = $event" :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" />
-    <Navigator :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl"/>
+    <v-api ref='api' :baseUrl="baseUrl" :id="id" @setid="id = $event" :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :default_language="default_language" language="language" />
+    <Navigator :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :default_language="default_language" language="language" />
     <div id="app">
-      <Loading v-if="this.loading" :loading="this.loading" />
-      <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setloading="loading = $event" />
+      <Loading v-if="this.loading" :loading="this.loading" :default_language="default_language" language="language" />
+      <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setloading="loading = $event" :default_language="default_language" language="language" />
     </div>
-    <Footer />
+    <Footer :default_language="default_language" language="language" />
   </div>
 </template>
 
@@ -26,8 +26,13 @@ export default {
       stoken: sessionStorage.getItem('stoken'),
       online: false,
       title: 'Light URL Shortener',
+      default_language: navigator.language,
+      language: navigator.language,
       menu: {
-        alt: 'sho.ovh'
+        alt: 'sho.ovh',
+        img: {
+          src: 'favicon-32x32.png'
+        }
       }
     }
   },
