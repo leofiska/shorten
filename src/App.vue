@@ -4,9 +4,9 @@
     <Navigator :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" />
     <Loading v-if="this.loading" :loading="this.loading" language="language" />
     <div id="app">
-      <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setloading="loading = $event"  language="language" />
+      <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setloading="loading = $event"  :language="language" />
     </div>
-    <Footer :language="language" @setlanguage="language = $event"/>
+    <Footer :language="language" @setlanguage="language = $event" :title="title" />
   </div>
 </template>
 
@@ -56,6 +56,8 @@ export default {
     unsubscribe (request) {
       this.$refs.api.unsubscribe(request)
     }
+  },
+  watch: {
   }
 }
 </script>

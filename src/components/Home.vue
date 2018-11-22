@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>{{s.shorten}}</h2>
+    <h2>{{title}}</h2>
     <p>{{s.description}}</p>
     <div class='container text-center text-md-left'>
       <b-input-group>
@@ -59,18 +59,43 @@ export default {
       dismissCountDown: 0,
       original_url: '',
       shorten_url: '',
+      sentences: [
+        {
+          alias: 'en-us',
+          content:
+          {
+            clear_tooltip: 'clears all',
+            copy_tooltip: 'copy short url to clipboard',
+            type_url: 'type url here',
+            shorten: 'Light URL Shortener',
+            url: 'URL',
+            short_url: 'Short URL',
+            short: 'Shorten URL',
+            description: 'simplify your links and share them easily',
+            copied: 'link copied',
+            description_1: 'The service has been started on November 19th, 2018 and it is totally free of charge with no ads and no tracking, as it should be provided forever',
+            description_2: 'Suggestions are welcome, please use the e-mail in the footer of the page. New features will continue to be implemented'
+          }
+        },
+        {
+          alias: 'pt-br',
+          content:
+          {
+            clear_tooltip: 'limpar tudo',
+            copy_tooltip: 'copia url simplificada para área de transferência',
+            type_url: 'digita a url aqui',
+            shorten: 'Light URL Shortener',
+            url: 'URL',
+            short_url: 'URL Simplificada',
+            short: 'Simplificar URL',
+            description: 'simplifique seus links e os compartilhe mais facilmente',
+            copied: 'link copiado',
+            description_1: 'Este serviço foi iniciado em 19 de novembro de 2018 and é totalmente gratuito e livre de anúncios e rastreios, como deve permenecer para sempre',
+            description_2: 'Sugestões são bem-vindas, utilize o e-mail que está no rodapé da página. Novas facilidades continuarão a ser implementadas'
+          }
+        }
+      ],
       s: {
-        clear_tooltip: 'clears all',
-        copy_tooltip: 'copy short url to clipboard',
-        type_url: 'type url here',
-        shorten: 'Light URL Shortener',
-        url: 'URL',
-        short_url: 'Short URL',
-        short: 'Shorten URL',
-        description: 'simplify your links and share them easily',
-        copied: 'link copied',
-        description_1: 'The service has been started on November 9th, 2018 and it is totally free of charge with no ads and no tracking, as it should be provided forever.',
-        description_2: 'Suggestions are welcome, please use the e-mail in the footer of the page. New features will continue to be implemented'
       },
       items: { tid: -1, loading: true, elements: [] }
     }
@@ -84,6 +109,15 @@ export default {
   ],
   mounted () {
     document.title = this.title
+  },
+  created () {
+    for (var i = 0; this.sentences[i] !== undefined; i++) {
+      if (this.sentences[i].alias === this.language) {
+        this.s = this.sentences[i].content
+        return
+      }
+    }
+    this.s = this.sentences[0].content
   },
   methods: {
     clear: function () {
@@ -118,6 +152,14 @@ export default {
   watch: {
     original_url: function (val, oldVal) {
       this.shorten_url = ''
+    },
+    language: function (newVal, oldVal) {
+      for (var i = 0; this.sentences[i] !== undefined; i++) {
+        if (this.sentences[i].alias === newVal) {
+          this.s = this.sentences[i].content
+          break
+        }
+      }
     }
   }
 }
