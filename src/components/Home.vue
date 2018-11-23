@@ -88,7 +88,7 @@ export default {
             short: 'Shorten URL',
             description: 'simplify your links and share them easily',
             copied: 'link copied',
-            invaliddomain: 'link is not correct as the domain was not found',
+            invaliddomain: 'host/domain not found',
             description_1: 'The service has been started on November 19th, 2018 and it is totally free of charge with no ads and no tracking, as it should be provided forever',
             description_2: 'Suggestions are welcome, please use the e-mail in the footer of the page. New features will continue to be implemented'
           }
@@ -106,7 +106,7 @@ export default {
             short: 'Simplificar URL',
             description: 'simplifique seus links e os compartilhe mais facilmente',
             copied: 'link copiado',
-            invaliddomain: 'link não está correto porque o dominio não foi encontrado',
+            invaliddomain: 'host/dominio não encontrado',
             description_1: 'Este serviço foi iniciado em 19 de novembro de 2018 e é totalmente gratuito, livre de anúncios e rastreios, como deve permenecer para sempre',
             description_2: 'Sugestões são bem-vindas!! Utilize o e-mail que está no rodapé da página para fazê-las. Novas facilidades continuarão a ser implementadas'
           }
