@@ -1,7 +1,8 @@
 <template>
   <div>
-    <v-api ref='api' :baseUrl="baseUrl" :id="id" @setid="id = $event" :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :language="language" />
+    <v-api ref='api' :baseUrl="baseUrl" :id="id" @setid="id = $event" :token="token" @settoken="token = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :language="language" />
     <Navigator :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" />
+    <Login v-if="ltoken === null" :language="language" :online="online" @login="login" @setloading="loading = $event" />
     <Loading v-if="this.loading" :loading="this.loading" language="language" />
     <div id="app">
       <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setloading="loading = $event"  :language="language" />
@@ -14,6 +15,7 @@
 import Navigator from '@/components/Navigator'
 import Footer from '@/components/Footer'
 import Loading from '@/components/Loading.vue'
+import Login from '@/components/Login'
 
 export default {
   name: 'App',
@@ -42,11 +44,15 @@ export default {
   components: {
     Navigator,
     Footer,
-    Loading
+    Loading,
+    Login
   },
   methods: {
     setlanguage (nl) {
       this.language = nl
+    },
+    login (id, password) {
+      this.$refs.api.login(id, password)
     },
     fetch (request) {
       this.$refs.api.fetch(request)

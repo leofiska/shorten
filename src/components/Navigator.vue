@@ -9,7 +9,7 @@
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right :disabled="!online" text="Account">
-          <b-dropdown-item to="/login" v-if="!ltoken" :disabled="!online">Sign-In</b-dropdown-item>
+          <b-dropdown-item v-b-modal.login v-if="!ltoken" :disabled="!online">Sign-In</b-dropdown-item>
           <b-dropdown-item to="/profile" v-if="ltoken" :disabled="!online">Profile</b-dropdown-item>
           <b-dropdown-item @click.prevent="logout" v-if="ltoken" :disabled="!online">Sign-Out</b-dropdown-item>
         </b-nav-item-dropdown>

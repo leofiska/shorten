@@ -4,6 +4,7 @@ export default {
   props: [
     'token',
     'stoken',
+    'ltoken',
     'online',
     'baseUrl'
   ],
