@@ -8,10 +8,10 @@
         <b-nav-item :to="item.path" v-for="item in items.elements" :key="item.path" :disabled="!online" v-if="( item.meta.alwaysVisible || (item.meta.requireAuth && ltoken !== null) || (!item.meta.requireAuth && (ltoken === null && item.meta.guestOnly || !item.meta.guestOnly)) )">{{s.menu[item.name]}}</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
-        <b-nav-item-dropdown right :disabled="!online" text="Account">
-          <b-dropdown-item v-b-modal.login v-if="!ltoken" :disabled="!online">Sign-In</b-dropdown-item>
-          <b-dropdown-item to="/profile" v-if="ltoken" :disabled="!online">Profile</b-dropdown-item>
-          <b-dropdown-item @click.prevent="logout" v-if="ltoken" :disabled="!online">Sign-Out</b-dropdown-item>
+        <b-nav-item-dropdown right :disabled="!online" :text="s.account">
+          <b-dropdown-item v-b-modal.login v-if="!ltoken" :disabled="!online">{{s.signin}}</b-dropdown-item>
+          <b-dropdown-item to="/profile" v-if="ltoken" :disabled="!online">{{s.profile}}</b-dropdown-item>
+          <b-dropdown-item @click.prevent="logout" v-if="ltoken" :disabled="!online">{{s.signout}}</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-collapse>
@@ -29,6 +29,10 @@ export default {
           alias: 'en-us',
           content:
           {
+            account: 'Account',
+            signin: 'Sign-In',
+            profile: 'Profile',
+            signout: 'Sign-Out',
             menu: [
               'About',
               'Home'
@@ -39,6 +43,10 @@ export default {
           alias: 'pt-br',
           content:
           {
+            account: 'Conta',
+            signin: 'Autenticar',
+            profile: 'Perfil',
+            signout: 'Sair',
             menu: [
               'Sobre',
               'Home'
