@@ -11,9 +11,14 @@ import { faSpinner, faTrash, faCopy } from '@fortawesome/free-solid-svg-icons'
 import { faLinkedin, faFacebook } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import bNav from 'bootstrap-vue/es/components/nav/nav'
+import bNavForm from 'bootstrap-vue/es/components/nav/nav-form'
+import bNavItem from 'bootstrap-vue/es/components/nav/nav-item'
 import bNavItemDropDown from 'bootstrap-vue/es/components/nav/nav-item-dropdown'
 import bNavbar from 'bootstrap-vue/es/components/navbar/navbar'
 import bNavbarBrand from 'bootstrap-vue/es/components/navbar/navbar-brand'
+import bNavbarToggle from 'bootstrap-vue/es/components/navbar/navbar-toggle'
+import bNavbarNav from 'bootstrap-vue/es/components/navbar/navbar-nav'
+import bCollapse from 'bootstrap-vue/es/components/collapse/collapse'
 import bButton from 'bootstrap-vue/es/components/button/button'
 import bForm from 'bootstrap-vue/es/components/form/form'
 import bFormInput from 'bootstrap-vue/es/components/form-input/form-input'
@@ -31,9 +36,14 @@ Vue.use(Clipboard)
 Vue.component('v-api', api)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 Vue.component('b-nav', bNav)
+Vue.component('b-nav-form', bNavForm)
+Vue.component('b-nav-item', bNavItem)
 Vue.component('b-nav-item-dropdown', bNavItemDropDown)
 Vue.component('b-navbar', bNavbar)
 Vue.component('b-navbar-brand', bNavbarBrand)
+Vue.component('b-navbar-toggle', bNavbarToggle)
+Vue.component('b-navbar-nav', bNavbarNav)
+Vue.component('b-collapse', bCollapse)
 Vue.component('b-button', bButton)
 Vue.component('b-form', bForm)
 Vue.component('b-form-input', bFormInput)

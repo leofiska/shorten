@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-api ref='api' :baseUrl="baseUrl" :id="id" @setid="id = $event" :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :language="language" />
-    <Navigator :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" />
+    <Navigator :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" />
     <Loading v-if="this.loading" :loading="this.loading" language="language" />
     <div id="app">
       <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setloading="loading = $event"  :language="language" />
@@ -24,6 +24,7 @@ export default {
       id: null,
       token: localStorage.getItem('token'),
       stoken: sessionStorage.getItem('stoken'),
+      ltoken: localStorage.getItem('ltoken'),
       online: false,
       title: 'Light URL Shortener',
       language: navigator.language.toLowerCase(),
