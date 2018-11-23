@@ -3,6 +3,7 @@ var config = require('../../config/config.json');
 var database = require(__dirname + '/../resource/database.js');
 var shortid = require('shortid');
 var dns = require('dns');
+var validateIP = require('validate-ip-node');
 /* eslint-disable no-new */
 var {ObjectId} = require('mongodb');
 var safeObjectId = s => ObjectId.isValid(s) ? new ObjectId(s) : null;
@@ -46,12 +47,12 @@ function verify_and_create(ws, db, obj) {
   var par = obj.options.id.split(/'?\/'?/).filter(function(v) { return v; });;
   if ( par[0].indexOf('http') == -1 ) {
     if ( par[0].indexOf(' ') != -1 ) {
-      ws.send(JSON.stringify({ f: 'create', error: 403, tid: obj.tid }));
+      ws.send(JSON.stringify({ f: 'create', error: 404, tid: obj.tid }));
       return;
     }
     obj.options.id = 'http://'+par.join('/');
   } else if ( par[1] == undefined || par[1].indexOf(' ') != -1 ) {
-    ws.send(JSON.stringify({ f: 'create', error: 403, tid: obj.tid }));
+    ws.send(JSON.stringify({ f: 'create', error: 404, tid: obj.tid }));
     return;
   } else {
     obj.options.id = par[0].replace(':','')+'://';
@@ -82,10 +83,20 @@ function verify_and_create(ws, db, obj) {
 function create(ws, db, obj) {
   var dbo = db.db(database.db);
   var par = obj.options.id.split(/'?\/'?/).filter(function(v) { return v; });
-  if ( par[1].indexOf(':') != -1 ) {
-    par[1] = par[1].substr(0,par[1].indexOf(':'));
+  var domain = par[1];
+  var ipv6 = false;
+  if (domain.indexOf(']') != -1 && domain.indexOf('[') != -1) {
+    domain = domain.substr(1,domain.indexOf(']')-1);
+    ipv6 = true;
   }
-  dns.lookup(par[1], (err, addresses, family) => {  
+  if (ipv6 === false && domain.indexOf(':') != -1) {
+    domain = domain.substr(0,domain.indexOf(':'));
+  }
+  if (validateIP(domain) === false && (ipv6 === false && /[a-zA-Z]/.test(par[1]) === false)) {
+    ws.send(JSON.stringify({ f: 'create', error: 404, tid: obj.tid }));
+    return;
+  }
+  dns.lookup(domain, (err, addresses, family) => {  
     if (addresses === undefined ) {
       ws.send(JSON.stringify({ f: 'create', error: 404, tid: obj.tid }));
       return;

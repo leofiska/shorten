@@ -33,6 +33,7 @@
     "shortid": "^2.2.14",
     "spdy": "^4.0.0",
     "v-clipboard": "^2.0.1",
+    "validate-ip-node": "^1.0.6",
     "vue": "^2.5.2",
     "vue-lang-code-flags": "^1.0.4",
     "vue-router": "^3.0.1",
