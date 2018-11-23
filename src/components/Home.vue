@@ -7,7 +7,7 @@
         <b-input-group>
           <b-form-input v-model="original_url" :placeholder="s.type_url"></b-form-input>
           <b-input-group-append>
-            <b-button variant="outline-success" :disabled="!online" type="submit">{{s.short}}</b-button>
+            <b-button variant="outline-success" :disabled="!online || this.original_url === ''" type="submit">{{s.short}}</b-button>
             <b-button v-if="this.original_url === ''" variant="outline-secondary" :disabled="true">
               <font-awesome-icon :icon="['fas', 'trash']" />
             </b-button>
