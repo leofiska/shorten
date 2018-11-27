@@ -1,6 +1,12 @@
 <template>
   <div>
     <h2>{{title}}</h2>
+    <h4>{{s.about}}</h4>
+    <div class='container text-center text-md-left'>
+      <p>{{s.description_1}}</p>
+      <br />
+      <p>{{s.description_2}}</p>
+    </div>
   </div>
 </template>
 
@@ -15,14 +21,18 @@ export default {
           alias: 'en-us',
           content:
           {
-            clear_tooltip: 'clears all'
+            about: 'About',
+            description_1: 'The service has been started on November 19th, 2018 and it is totally free of charge with no ads and no tracking, as it should be provided forever',
+            description_2: 'Suggestions are welcome, please use the e-mail in the footer of the page. New features will continue to be implemented'
           }
         },
         {
           alias: 'pt-br',
           content:
           {
-            clear_tooltip: 'limpar tudo'
+            about: 'Sobre',
+            description_1: 'Este serviço foi iniciado em 19 de novembro de 2018 e é totalmente gratuito, livre de anúncios e rastreios, como deve permenecer para sempre',
+            description_2: 'Sugestões são bem-vindas!! Utilize o e-mail que está no rodapé da página para fazê-las. Novas facilidades continuarão a ser implementadas'
           }
         }
       ],
