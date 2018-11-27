@@ -8,7 +8,7 @@
         <b-form-input id="password" type="password" v-model="password" required :placeholder="s.password"></b-form-input>
       </b-form-group>
        <b-form-checkbox-group v-model="keep">
-          <b-form-checkbox value="keep">{{s.keep}}</b-form-checkbox>
+          <b-form-checkbox>{{s.keep}}</b-form-checkbox>
         </b-form-checkbox-group>
       <br />
       <div class='position-relative text-center' style='min-height: 5rem;'>
@@ -52,7 +52,7 @@ export default {
       dismissCountDown: 0,
       email: '',
       password: '',
-      keep: 'keep',
+      keep: true,
       sentences: [
         {
           alias: 'en-us',
@@ -110,7 +110,7 @@ export default {
     login () {
       this.$emit('setloading', true)
       this.dismissCountDown = 0
-      this.$emit('fetch', { method: 'login', storno: this.storno, context: this, sync: this.items, options: { f: 'login', id: this.email, pass: this.password } })
+      this.$emit('fetch', { method: 'login', storno: this.storno, context: this, sync: this.items, options: { f: 'login', id: this.email, pass: this.password, keep: this.keep } })
       // this.$emit('login', this.email, this.password)
     },
     clear () {
@@ -122,7 +122,6 @@ export default {
     },
     storno (obj) {
       this.$emit('setloading', false)
-      console.log(JSON.stringify(obj))
       if (obj.error !== false) {
         switch (obj.error) {
           case 404:
@@ -132,6 +131,14 @@ export default {
       } else {
         this.loginAnswer = this.s.success
         this.success = true
+        localStorage.removeItem('ltoken')
+        sessionStorage.removeItem('ltoken')
+        if (obj.content.keep === true) {
+          localStorage.setItem('ltoken', obj.content.ltoken)
+        } else {
+          sessionStorage.setItem('ltoken', obj.content.ltoken)
+        }
+        this.$emit('setltoken', obj.content.ltoken)
         this.hide()
       }
       this.dismissCountDown = this.dismissSecs
@@ -145,9 +152,6 @@ export default {
           break
         }
       }
-    },
-    keep: function (newVal, oldVal) {
-      console.log(newVal + '<-' + oldVal)
     }
   }
 }

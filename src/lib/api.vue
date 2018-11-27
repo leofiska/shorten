@@ -33,6 +33,7 @@ export default {
           for (var i = 0; i < this.subscriptions.length; i++) {
             this.subscribe(this.bindings[this.subscriptions[i] - 1])
           }
+          this.send({f: 'auth', ltoken: this.ltoken}, true)
         }
         this.socket.onmessage = (e) => {
           try {
@@ -53,6 +54,8 @@ export default {
         }
       },
       send: function (f, forced) {
+        this.$emit('setltoken', sessionStorage.getItem('ltoken') || localStorage.getItem('ltoken'))
+        this.$emit('setlanguage', localStorage.getItem('language'))
         if (((forced !== undefined && forced === true) || this.online === true) &&
           this.socket &&
           this.socket !== null &&
@@ -72,6 +75,13 @@ export default {
       },
       executeServerMessage: function (obj) {
         switch (obj.f) {
+          case 'auth':
+            if (obj.error !== false) {
+              this.$emit('setltoken', null)
+              sessionStorage.removeItem('ltoken')
+              localStorage.removeItem('ltoken')
+            }
+            break
           case 'token':
             if (obj.error !== false) {
               this.$emit('settoken', null)

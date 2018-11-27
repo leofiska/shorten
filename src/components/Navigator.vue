@@ -59,6 +59,7 @@ export default {
       s: {
       },
       items: {
+        tid: -1,
         elements: [
           {
             name: 1,
@@ -100,6 +101,18 @@ export default {
     this.s = this.sentences[0].content
   },
   methods: {
+    logout () {
+      this.$emit('setloading', true)
+      this.$emit('fetch', { method: 'logout', storno: this.storno, context: this, sync: this.items, options: { f: 'logout' } })
+    },
+    storno (obj) {
+      console.log(JSON.stringify(obj))
+      if (obj.error === false) {
+        this.$emit('setltoken',null)
+        localStorage.removeItem('ltoken')
+        sessionStorage.removeItem('ltoken')
+      }
+    }
   },
   watch: {
     language: function (newVal, oldVal) {
