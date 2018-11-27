@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/Home'
+import Profile from '@/components/Profile'
 import About from '@/components/About'
 
 Vue.use(Router)
@@ -16,6 +17,11 @@ let router = new Router({
       path: '/about',
       name: 'about',
       component: About
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: Profile
     }
   ]
 })
@@ -29,33 +35,7 @@ router.beforeEach((to, from, next) => {
     })
     return
   }
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (localStorage.getItem('token') === null || localStorage.getItem('token') === undefined) {
-      next({
-        path: '/login',
-        params: { nextUrl: to.fullPath }
-      })
-    } else {
-      let user = JSON.parse(localStorage.getItem('user'))
-      if (to.matched.some(record => record.meta.is_admin)) {
-        if (user.is_admin === 1) {
-          next()
-        } else {
-          next({name: 'home'})
-        }
-      } else {
-        next()
-      }
-    }
-  } else if (to.matched.some(record => record.meta.guestOnly)) {
-    if (localStorage.getItem('token') == null) {
-      next()
-    } else {
-      next({ name: 'home' })
-    }
-  } else {
-    next()
-  }
+  next()
 })
 
 export default router
