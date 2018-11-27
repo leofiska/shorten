@@ -46,7 +46,7 @@ export default {
           content:
           {
             account: 'Conta',
-            signin: 'Autenticar',
+            signin: 'Entrar',
             profile: 'Perfil',
             signout: 'Sair',
             menu: [
