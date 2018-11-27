@@ -9,7 +9,7 @@ module.exports = {
 };
 
 var exec = function(req, ws, obj) {
-  console.log(JSON.stringify(obj));
+  // console.log(JSON.stringify(obj));
   if (obj.options.id === undefined ||
     obj.options.pass === undefined ||
     obj.options.pass === '' ||
@@ -17,7 +17,7 @@ var exec = function(req, ws, obj) {
     ws.send(JSON.stringify({ f: 'login', error: 401, tid: obj.tid }));
     return;
   }
-  var params = { password: '', id: ' '};
+  var params = { password: '', id: ' ', keep: true };
   try {
     database.client.connect(database.url, { useNewUrlParser: true },
       function(err, db) {
@@ -29,6 +29,7 @@ var exec = function(req, ws, obj) {
         var hash = crypto.createHmac('sha512', obj.options.pass);
         params.password = hash.digest('hex');
         params.id = obj.options.id;
+        params.keep = obj.options.keep;
         var query = {
           email: {
             $elemMatch: {
@@ -43,8 +44,6 @@ var exec = function(req, ws, obj) {
             return;
           }
           if (doc != null) {
-            // FOUND
-            console.log('found!!')
             var auth = function() {
               var hash = crypto.createHmac('sha512', '' + new Date().getTime());
               hash = hash.digest('hex');
@@ -58,33 +57,47 @@ var exec = function(req, ws, obj) {
                   if (result != null) {
                     auth();
                   } else {
-                    // var expires = 0;
-                    // if ( params.keep_connected == 'on' ) expires = 60;
+                    var expires = 0;
+                    if ( params.keep === true ) expires = 60;
                     var d = new Date();
-                    d.setTime(d.getTime() + (60 * 24 * 60 * 60 * 1000));
-                    var obj = {
+                    d.setTime(d.getTime() + (expires * 24 * 60 * 60 * 1000));
+                    var obj2 = {
                       user_id: doc._id,
                       sid: hash,
                       time: (new Date()),
                       expires: d,
-                      keep: params.keep_connected === 'on' ? 1 : 0,
+                      keep: params.keep
                     };
                     dbo.collection('user_auth')
-                      .insertOne(obj, function(err, result) {
+                      .insertOne(obj2, function(err, result) {
                         if (err) {
                           ws.send(JSON.stringify(
                             { f: 'login', auth: false, error: 500, tid: obj.tid }));
                           return;
                         }
                         // plot( res, JSON.stringify({token: hash}), 200 );
-                        ws.user.id = doc.id;
+                        ws.user.username = doc.username;
+                        ws.user.email = params.id;
                         ws.user.is_admin = doc.admin;
-                        ws.user.auth.sid = obj.sid;
-                        ws.user.auth.keep - obj.keep;
+                        ws.user.auth.sid = obj2.sid;
+                        ws.user.auth.keep = obj2.keep;
+                        // console.log(JSON.stringify(ws.user));
                         ws.send(JSON.stringify(
-                          { f: 'login', auth: true, error: 0, content:
-                          {ltoken: hash, user:
-                            {id: doc.id, admin: doc.admin}} }));
+                        {
+                          f: 'login',
+                          auth: true,
+                          error: false,
+                          tid: obj.tid,
+                          content:
+                          {
+                            ltoken: hash,
+                            keep: params.keep,
+                            user: {
+                              id: doc.id,
+                              admin: doc.admin
+                            }
+                          }
+                        }));
                         db.close();
                       });
                   }
