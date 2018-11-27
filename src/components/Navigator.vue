@@ -108,7 +108,7 @@ export default {
     storno (obj) {
       console.log(JSON.stringify(obj))
       if (obj.error === false) {
-        this.$emit('setltoken',null)
+        this.$emit('setltoken', null)
         localStorage.removeItem('ltoken')
         sessionStorage.removeItem('ltoken')
       }
