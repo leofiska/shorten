@@ -7,12 +7,14 @@
       <b-navbar-nav>
         <b-nav-item :to="item.path" v-for="item in items.elements" :key="item.path" :disabled="!online" v-if="( item.meta.alwaysVisible || (item.meta.requireAuth && ltoken !== null) || (!item.meta.requireAuth && (ltoken === null && item.meta.guestOnly || !item.meta.guestOnly)) )">{{s.menu[item.name]}}</b-nav-item>
       </b-navbar-nav>
-      <b-navbar-nav class="ml-auto">
+      <b-navbar-nav class="ml-auto" v-if="ltoken">
         <b-nav-item-dropdown right :disabled="!online" :text="s.account">
-          <b-dropdown-item v-b-modal.login v-if="!ltoken" :disabled="!online">{{s.signin}}</b-dropdown-item>
           <b-dropdown-item to="/profile" v-if="ltoken" :disabled="!online">{{s.profile}}</b-dropdown-item>
           <b-dropdown-item @click.prevent="logout" v-if="ltoken" :disabled="!online">{{s.signout}}</b-dropdown-item>
         </b-nav-item-dropdown>
+      </b-navbar-nav>
+      <b-navbar-nav class="ml-auto" v-else>
+         <b-nav-item v-b-modal.login :disabled="!online">{{s.signin}}</b-nav-item>
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
