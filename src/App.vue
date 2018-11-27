@@ -2,7 +2,7 @@
   <div>
     <v-api ref='api' :baseUrl="baseUrl" :id="id" @setid="id = $event" :token="token" @settoken="token = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :language="language" />
     <Navigator :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" />
-    <Login v-if="ltoken === null" :language="language" :online="online" @login="login" @setloading="loading = $event" />
+    <Login v-if="ltoken === null" :language="language" :online="online" @fetch="fetch" @setloading="loading = $event" />
     <Loading v-if="this.loading" :loading="this.loading" language="language" />
     <div id="app">
       <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setloading="loading = $event"  :language="language" />
