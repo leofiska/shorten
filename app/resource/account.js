@@ -13,7 +13,7 @@ function initialize(req, res, renew, cb) {
       keep: false,
     },
   };
-  if (req.query.token === undefined || req.query.token === '') {
+  if (req.query.ltoken === undefined || req.query.ltoken === '') {
     cb(req, res, user);
     return;
   }
