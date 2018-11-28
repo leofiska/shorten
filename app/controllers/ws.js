@@ -14,7 +14,7 @@ fs.readdir(__dirname + '/../operations/', function(err, files) {
 
 exports.process = function(ws, req) {
   try {
-    process(req, ws);
+    process( req, ws );
   } catch (e) {
     console.log('[' +
       req.connection.remoteAddress +
@@ -30,9 +30,19 @@ function process(req, ws) {
   console.log('[' + peer + '] connected. Peers: ' + connected_peers);
   ws = {
     handler: ws,
-    user: null,
+    user: {
+      username: '',
+      email: '',
+      id: '',
+      is_admin: '',
+      auth: {
+        sid: '',
+        keep: ''
+      }
+    },
     token: null,
     stoken: null,
+    ltoken: null,
     send: function(msg) {
       if (this.handler.readyState === this.handler.OPEN)
         if (typeof msg === 'string' || msg instanceof String)
