@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-api ref='api' :baseUrl="baseUrl" :id="id" @setid="id = $event" :token="token" @settoken="token = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :stoken="stoken" @setstoken="stoken = $event" @setlanguage="language = $event" :online="online" @setOnline="online = $event" :language="language" />
+    <v-api ref='api' :apiUrl="apiUrl" :id="id" @setid="id = $event" :token="token" @settoken="token = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :stoken="stoken" @setstoken="stoken = $event" @setlanguage="language = $event" :online="online" @setOnline="online = $event" :language="language" />
     <Navigator :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" @fetch="fetch" />
     <Login v-if="ltoken === null" :language="language" :online="online" @fetch="fetch" @setloading="loading = $event" @setltoken="ltoken = $event" />
     <Loading v-if="this.loading" :loading="this.loading" language="language" />
@@ -14,14 +14,17 @@
 <script>
 import Navigator from '@/components/Navigator'
 import Footer from '@/components/Footer'
-import Loading from '@/components/Loading.vue'
+import Loading from '@/components/Loading'
 import Login from '@/components/Login'
+
+import config from '@/lib/config.json'
 
 export default {
   name: 'App',
   data () {
     return {
-      baseUrl: 'sho.ovh',
+      baseUrl: config.baseUrl,
+      apiUrl: config.apiUrl,
       loading: false,
       id: null,
       token: localStorage.getItem('token'),
@@ -29,12 +32,12 @@ export default {
       ltoken: sessionStorage.getItem('ltoken') || localStorage.getItem('ltoken'),
       // ltoken: localStorage.getItem('ltoken'),
       online: false,
-      title: 'Light URL Shortener',
+      title: config.title,
       language: navigator.language.toLowerCase(),
       menu: {
-        alt: 'sho.ovh',
+        alt: 'sim',
         img: {
-          src: 'favicon-32x32.png'
+          src: 'favicons/favicon-32x32.png'
         }
       }
     }

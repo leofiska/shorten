@@ -6,7 +6,7 @@ export default {
     'stoken',
     'ltoken',
     'online',
-    'baseUrl'
+    'apiUrl'
   ],
   render () {
     return {
@@ -18,7 +18,7 @@ export default {
       subscriptions: [],
       loading: false,
       socket: null,
-      url: 'wss://' + this.baseUrl + '/api',
+      url: 'wss://' + this.apiUrl + '/api',
       createSocket: function () {
         delete this.socket
         this.socket = null
