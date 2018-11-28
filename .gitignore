@@ -19,4 +19,3 @@ yarn-error.log*
 *.key
 *.pem
 config/config.json
-src/lib/config.json
