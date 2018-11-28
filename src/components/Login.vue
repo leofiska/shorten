@@ -111,7 +111,6 @@ export default {
       this.$emit('setloading', true)
       this.dismissCountDown = 0
       this.$emit('fetch', { method: 'login', storno: this.storno, context: this, sync: this.items, options: { f: 'login', id: this.email, pass: this.password, keep: this.keep } })
-      // this.$emit('login', this.email, this.password)
     },
     clear () {
       this.email = ''
@@ -158,7 +157,7 @@ export default {
 </script>
 
 <style scoped>
-* {
+*:not(input) {
   -webkit-user-select:none;
   -khtml-user-select:none;
   -moz-user-select:none;
