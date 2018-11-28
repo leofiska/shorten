@@ -3,8 +3,9 @@ import App from './App'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.min.css'
 // import BootstrapVue from 'bootstrap-vue/dist/bootstrap-vue.min.js'
-import router from './router'
+import router from '@/lib/router'
 import api from '@/lib/api'
+import routes from '@/lib/routes'
 import Clipboard from 'v-clipboard'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faSpinner, faTrash, faCopy } from '@fortawesome/free-solid-svg-icons'
@@ -40,6 +41,7 @@ library.add(faSpinner, faCopy, faTrash, faLinkedin, faFacebook)
 // Vue.use(BootstrapVue)
 Vue.use(Clipboard)
 Vue.component('v-api', api)
+Vue.component('routes', routes)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 Vue.component('b-modal', bModal)

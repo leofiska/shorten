@@ -5,7 +5,7 @@
     <b-navbar-brand v-else to="/">{{this.menu.alt}}</b-navbar-brand>
     <b-collapse is-nav id="nav_collapse">
       <b-navbar-nav>
-        <b-nav-item :to="item.path" v-for="item in items.elements" :key="item.path" :disabled="!online" v-if="( item.meta.alwaysVisible || (item.meta.requireAuth && ltoken !== null) || (!item.meta.requireAuth && (ltoken === null && item.meta.guestOnly || !item.meta.guestOnly)) )">{{s.menu[item.name]}}</b-nav-item>
+        <b-nav-item :to="item.path" v-for="item in routes" :key="item.path" :disabled="!online" v-if="(item.meta.isDisplayed === true && ( item.meta.alwaysVisible || (item.meta.requireAuth && ltoken !== null) || (!item.meta.requireAuth && (ltoken === null && item.meta.guestOnly || !item.meta.guestOnly)) ))">{{s.menu[item.array]}}</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto" v-if="ltoken">
         <b-nav-item-dropdown right :disabled="!online" :text="s.account">
@@ -59,27 +59,7 @@ export default {
       s: {
       },
       items: {
-        tid: -1,
-        elements: [
-          {
-            name: 1,
-            path: '/home',
-            meta: {
-              alwaysVisible: true,
-              requireAuth: false,
-              guestOnly: false
-            }
-          },
-          {
-            name: 0,
-            path: '/about',
-            meta: {
-              alwaysVisible: true,
-              requireAuth: false,
-              guestOnly: false
-            }
-          }
-        ]
+        tid: -1
       }
     }
   },
@@ -104,6 +84,9 @@ export default {
     logout () {
       this.$emit('setloading', true)
       this.$emit('fetch', { method: 'logout', storno: this.storno, context: this, sync: this.items, options: { f: 'logout' } })
+      if (this.$route.name === 'profile') {
+        this.$router.push('/home')
+      }
     },
     storno (obj) {
       console.log(JSON.stringify(obj))
@@ -122,6 +105,11 @@ export default {
           break
         }
       }
+    }
+  },
+  computed: {
+    routes () {
+      return this.$router.options.routes
     }
   }
 }
