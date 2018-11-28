@@ -11,9 +11,8 @@ var exec = function(req, ws, obj) {
   database.client.connect(database.url, { useNewUrlParser: true },
     function(err, db) {
       if (err) {
-        if (ws.readyState === ws.OPEN)
-          ws.send(JSON.stringify(
-            { f: 'token', error: 500 }));
+        ws.send(JSON.stringify(
+          { f: 'token', error: 500 }));
         return;
       }
       setTimeout(destroy.bind(this), 30000, db);
