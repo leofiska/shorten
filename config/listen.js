@@ -41,6 +41,7 @@ var setHeader = function(req, res) {
 module.exports = {
   serverListenPort: config.serverListenPort,
   serverListenAddress: config.serverListenAddress,
+  serverListenAddresses: config.serverListenAddresses,
   options: {
     ciphers: [
     /* PERFECT

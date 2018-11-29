@@ -35,9 +35,9 @@ export default {
       title: config.title,
       language: navigator.language.toLowerCase(),
       menu: {
-        alt: 'sim',
+        alt: 'sho.ovh',
         img: {
-          src: 'favicons/favicon-32x32.png'
+          src: 'favicon-32x32.png'
         }
       }
     }
