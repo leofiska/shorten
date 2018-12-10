@@ -125,6 +125,7 @@ export default {
         switch (obj.error) {
           case 404:
             this.loginAnswer = this.s.e404
+            this.password = ''
             break
         }
       } else {
