@@ -33,7 +33,9 @@ export default {
           for (var i = 0; i < this.subscriptions.length; i++) {
             this.subscribe(this.bindings[this.subscriptions[i] - 1])
           }
-          this.send({f: 'auth', ltoken: this.ltoken}, true)
+          if (this.ltoken !== null) {
+            this.send({f: 'auth', ltoken: this.ltoken}, true)
+          }
         }
         this.socket.onmessage = (e) => {
           try {
