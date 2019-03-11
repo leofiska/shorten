@@ -1,6 +1,8 @@
 'use strict';
 var crypto = require('crypto');
 var database = require(__dirname + '/../resource/database.js');
+var base = require(__dirname + '/../resource/base.js');
+var email = require(__dirname + '/../resource/email.js');
 
 module.exports = {
   process: function(req, ws, obj) {
@@ -8,111 +10,184 @@ module.exports = {
   },
 };
 
-var exec = function(req, ws, obj) {
-  // console.log(JSON.stringify(obj));
+async function exec (req, ws, obj) {
   if (obj.options.id === undefined ||
-    obj.options.pass === undefined ||
-    obj.options.pass === '' ||
+    ((obj.options.pass === undefined || obj.options.pass === '' ) && (obj.options.passcode === undefined || obj.options.passcode === '' )) ||
     obj.options.id === '') {
     ws.send(JSON.stringify({ f: 'login', error: 401, tid: obj.tid }));
     return;
   }
-  var params = { password: '', id: ' ', keep: true };
+  var params = { password: '', passcode: '', id: ' ', keep: true };
+  var res = null;
+  var auth = null;
+  var hash = null;
+  var bd_hash = null;
+  var query = '';
+
   try {
-    database.client.connect(database.url, { useNewUrlParser: true },
-      function(err, db) {
-        if (err) {
-          ws.send(JSON.stringify({ f: 'login', auth: false, error: 500, tid: obj.tid }));
+    switch(obj.options.f) {
+      case 'login_password':
+        params.password = crypto.createHash('whirlpool').update('--><'+crypto.createHash('sha256').update(obj.options.pass).digest('hex')+'-@-&').digest('hex');
+        params.id = crypto.createHash('whirlpool').update('--><'+crypto.createHash('sha256').update(obj.options.id).digest('hex')+'---&').digest('hex');
+        params.keep = obj.options.keep;
+        query = 'SELECT user_id, uid FROM v_user_passwords WHERE (user_nickname=\''+params.id+'\' OR user_primaryemail=\''+params.id+'\') AND (user_password=\''+params.password+'\') LIMIT 1';
+        var step1 = await database.query(query);
+        if ( step1 === null) {
+          ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 500, tid: obj.tid }));
           return;
         }
-        var dbo = db.db(database.db);
-        var hash = crypto.createHmac('sha512', obj.options.pass);
-        params.password = hash.digest('hex');
-        params.id = obj.options.id;
-        params.keep = obj.options.keep;
-        var query = {
-          email: {
-            $elemMatch: {
-              address: params.id
-            }
-          },
-          password: params.password
+        if (step1.rowCount !== 1) {
+          ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 404, tid: obj.tid }));
+          return;
         }
-        dbo.collection('users').findOne(query, function(err, doc) {
-          if (err) {
-            ws.send(JSON.stringify({ f: 'login', auth: false, error: 500, tid: obj.tid }));
+        auth = async function() {
+          hash = crypto.createHash('sha256').update('-&^'+(new Date().getTime())).digest('hex');
+          bd_hash = crypto.createHash('sha512').update(hash).digest('hex');
+          query = 'SELECT user_auth_id FROM tb_user_auth WHERE user_auth_hash=\''+bd_hash+'\' LIMIT 1';
+          res = await database.query(query);
+          if ( res === null) {
+            ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 500, tid: obj.tid }));
             return;
           }
-          if (doc != null) {
-            var auth = function() {
-              var hash = crypto.createHmac('sha512', '' + new Date().getTime());
-              hash = hash.digest('hex');
-              dbo.collection('user_auth')
-                .findOne({ sid: hash }, function(err, result) {
-                  if (err) {
-                    ws.send(JSON.stringify(
-                      { f: 'login', auth: false, error: 500, tid: obj.tid }));
-                    return;
-                  }
-                  if (result != null) {
-                    auth();
-                  } else {
-                    var expires = 0;
-                    if ( params.keep === true ) expires = 60;
-                    var d = new Date();
-                    d.setTime(d.getTime() + (expires * 24 * 60 * 60 * 1000));
-                    var obj2 = {
-                      user_id: doc._id,
-                      sid: hash,
-                      time: (new Date()),
-                      expires: d,
-                      keep: params.keep
-                    };
-                    dbo.collection('user_auth')
-                      .insertOne(obj2, function(err, result) {
-                        if (err) {
-                          ws.send(JSON.stringify(
-                            { f: 'login', auth: false, error: 500, tid: obj.tid }));
-                          return;
-                        }
-                        // plot( res, JSON.stringify({token: hash}), 200 );
-                        ws.user.username = doc.username;
-                        ws.user.email = params.id;
-                        ws.user.is_admin = doc.admin;
-                        ws.user.auth.sid = obj2.sid;
-                        ws.user.auth.keep = obj2.keep;
-                        // console.log(JSON.stringify(ws.user));
-                        ws.send(JSON.stringify(
-                        {
-                          f: 'login',
-                          auth: true,
-                          error: false,
-                          tid: obj.tid,
-                          content:
-                          {
-                            ltoken: hash,
-                            keep: params.keep,
-                            user: {
-                              id: doc.id,
-                              admin: doc.admin
-                            }
-                          }
-                        }));
-                        db.close();
-                      });
-                  }
-                });
-            };
+          if (res.rowCount !== 0) {
             auth();
-          } else {
-            ws.send(JSON.stringify({ f: 'login', auth: false, error: 404, tid: obj.tid }));
-            db.close();
+            return;
           }
-        });
-      });
+              //must add user_auth_global_id
+          query = 'INSERT INTO tb_user_auth ( user_auth_user_id, user_auth_hash, user_auth_global_id ) VALUES '+
+                  '( \''+step1.rows[0].user_id+'\', \''+bd_hash+'\', \''+ws.token.token_id+'\' )';
+          var step2 = await database.query(query);
+          if (step2 === null) {
+            ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 500, tid: obj.tid }));
+            return;
+          }
+          ws.send(JSON.stringify(
+          {
+            f: 'login_password',
+            auth: true,
+            error: false,
+            tid: obj.tid,
+            content:
+            {
+              ltoken: hash,
+              keep: params.keep,
+              user: {
+                id: step1.uid,
+              }
+            }
+          }));
+        };
+        auth();
+        break;
+      case 'autologin_passcode':
+        try {
+          params.id = base.base64decode(obj.options.id);
+          params.passcode = base.base64decode(obj.options.pass);
+          params.time = base.base64decode(obj.options.time);
+          params.keep = obj.options.keep;
+          query = 'SELECT * FROM tb_users WHERE user_attributes->\'usercode\'=\''+params.id+'\' AND user_attributes->\'passtime\'=\''+params.time+'\' AND user_attributes->\'passcode\'=\''+params.passcode+'\' AND (REGEXP_REPLACE(COALESCE(user_attributes->\'passtime\', \'0\'), \'[^0-9]*\' ,\'0\')::integer + 300) > '+Math.floor(Date.now() / 1000)+' LIMIT 1';
+          var step1 = await database.pg_query(query);
+          if (step1.rowCount !== 1) {
+            ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 404, tid: obj.tid }));
+            return;
+          }
+          auth = async function() {
+            hash = crypto.createHash('sha256').update('-&^'+(new Date().getTime())).digest('hex');
+            bd_hash = crypto.createHash('sha512').update(hash).digest('hex');
+            query = 'SELECT user_auth_id FROM tb_user_auth WHERE user_auth_hash=\''+bd_hash+'\' LIMIT 1';
+            res = await database.pg_query(query);
+            if (res.rowCount !== 0) {
+              auth();
+              return;
+            }
+              //must add user_auth_global_id
+            query = 'INSERT INTO tb_user_auth ( user_auth_user_id, user_auth_hash, user_auth_global_id ) VALUES '+
+                    '( \''+step1.rows[0].user_id+'\', \''+bd_hash+'\', \''+ws.token.token_id+'\' )';
+            res = await database.pg_query(query);
+            query = 'UPDATE tb_users SET user_attributes = delete(user_attributes, \'passcode\')';
+            res = await database.pg_query(query);
+            query = 'UPDATE tb_users SET user_attributes = delete(user_attributes, \'passtime\')';
+            res = await database.pg_query(query);
+            query = 'UPDATE tb_users SET user_attributes = delete(user_attributes, \'usercode\')';
+            res = await database.pg_query(query);
+            ws.send(JSON.stringify(
+            {
+              f: 'login_password',
+              auth: true,
+              error: false,
+              tid: obj.tid,
+              content:
+              {
+                ltoken: hash,
+                keep: params.keep,
+                user: {
+                  id: step1.rows[0].user_id,
+                }
+              }
+            }));
+          }
+          auth();
+        } catch (e) {
+          ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 404, tid: obj.tid }));
+          return;
+        }
+        break;
+      case 'login_passcode':
+        try {
+          params.id = crypto.createHash('whirlpool').update('--><'+crypto.createHash('sha256').update(obj.options.id).digest('hex')+'---&').digest('hex');
+          params.passcode = obj.options.pass;
+          params.keep = obj.options.keep;
+          query = 'SELECT * FROM tb_users WHERE (user_primaryemail_hashed = \''+params.id+'\' OR user_nickname_hashed=\''+params.id+'\') AND user_attributes->\'passcode\'=\''+params.passcode+'\' AND (REGEXP_REPLACE(COALESCE(user_attributes->\'passtime\', \'0\'), \'[^0-9]*\' ,\'0\')::integer + 300) > '+Math.floor(Date.now() / 1000)+' LIMIT 1';
+          var step1 = await database.pg_query(query);
+          if (step1.rowCount !== 1) {
+            ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 404, tid: obj.tid }));
+            return;
+          }
+          auth = async function() {
+            hash = crypto.createHash('sha256').update('-&^'+(new Date().getTime())).digest('hex');
+            bd_hash = crypto.createHash('sha512').update(hash).digest('hex');
+            query = 'SELECT user_auth_id FROM tb_user_auth WHERE user_auth_hash=\''+bd_hash+'\' LIMIT 1';
+            res = await database.pg_query(query);
+            if (res.rowCount !== 0) {
+              auth();
+              return;
+            }
+            query = 'INSERT INTO tb_user_auth ( user_auth_user_id, user_auth_hash, user_auth_global_id ) VALUES '+
+                    '( \''+step1.rows[0].user_id+'\', \''+bd_hash+'\', \''+ws.token.token_id+'\' )';
+            res = await database.pg_query(query);
+            query = 'UPDATE tb_users SET user_attributes = delete(user_attributes, \'passcode\')';
+            res = await database.pg_query(query);
+            query = 'UPDATE tb_users SET user_attributes = delete(user_attributes, \'passtime\')';
+            res = await database.pg_query(query);
+            query = 'UPDATE tb_users SET user_attributes = delete(user_attributes, \'usercode\')';
+            res = await database.pg_query(query);
+            ws.send(JSON.stringify(
+            {
+              f: 'login_password',
+              auth: true,
+              error: false,
+              tid: obj.tid,
+              content:
+              {
+                ltoken: hash,
+                keep: params.keep,
+                user: {
+                  id: step1.rows[0].user_id,
+                }
+              }
+            }));
+          }
+          auth();
+        } catch (e) {
+          ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 404, tid: obj.tid }));
+          return;
+        }
+        break;
+    }
   } catch (e) {
     if (ws.readyState === ws.OPEN)
       ws.send(JSON.stringify({ f: 'login', auth: false, error: 401 }));
     return;
   }
 };
+

@@ -16,8 +16,10 @@ async function exec (req, ws, obj) {
     return;
   }
   var bd_hash = crypto.createHash('sha512').update(obj.ltoken).digest('hex');
+  console.log(obj.ltoken);
+  console.log(bd_hash);
   var query = 'SELECT user_auth_user_id FROM tb_user_auth WHERE user_auth_hash=\''+bd_hash+'\' LIMIT 1';
-  var res = database.query(query);
+  var res = await database.query(query);
   if (res === null) {
     ws.user = null;
     user.unsubscribe(ws);
@@ -32,7 +34,7 @@ async function exec (req, ws, obj) {
   }
   query = 'SELECT '+user.query_elements+
     ' FROM v_users WHERE user_id=\''+res.rows[0].user_auth_user_id+'\' LIMIT 1';
-  res = database.query(query);
+  res = await database.query(query);
   if (res === null) {
     ws.user = null;
     user.unsubscribe(ws);

@@ -43,7 +43,7 @@ var exec = async function(req, ws, obj) {
     case 'setlanguage':
       query = 'UPDATE tb_users SET user_language=(SELECT CASE WHEN COUNT(1) = (SELECT COUNT(*) FROM tb_languages WHERE language_code=\''+obj.options.language+'\' LIMIT 1) THEN (SELECT language_id FROM tb_languages WHERE language_code=\''+obj.options.language+'\' LIMIT 1)  ELSE 1 END) WHERE user_id='+ws.user.user_id;
       try {
-        await database.pg_query(query);
+        await database.query(query);
         notify(ws.user.user_id);
       } catch (e) {
         ws.send({f: 'user', error: 500});
@@ -53,7 +53,7 @@ var exec = async function(req, ws, obj) {
     case 'set_attribute':
       query = 'UPDATE tb_users SET user_attributes=user_attributes||hstore(array[ array[\''+obj.options.attribute+'\'::text, \''+obj.options.value+'\'::text]]) WHERE user_id='+ws.user.user_id;
       try {
-        await database.pg_query(query);
+        await database.query(query);
         notify(ws.user.user_id);
       } catch (e) {
         ws.send({f: 'user', error: 500});
@@ -63,7 +63,7 @@ var exec = async function(req, ws, obj) {
       try {
         var id = crypto.createHash('whirlpool').update('--><'+crypto.createHash('sha256').update(obj.options.id).digest('hex')+'---&').digest('hex');
         query = 'SELECT * FROM tb_users WHERE (user_primaryemail_hashed = \''+id+'\' OR user_nickname_hashed=\''+id+'\') LIMIT 1';
-        var res = await database.pg_query(query);
+        var res = await database.query(query);
         if (res.rowCount !== 1) {
           console.log('user not found');
           ws.send(JSON.stringify({ f: 'request_passcode', error: false, tid: obj.tid }));
@@ -73,7 +73,7 @@ var exec = async function(req, ws, obj) {
         var usercode = shortid.generate();
         var passtime = Math.floor(Date.now() / 1000);
         query = 'UPDATE tb_users SET user_attributes=user_attributes||hstore(array[ array[\'passcode\'::text, \''+passcode+'\'::text], array[\'passtime\'::text, \''+passtime+'\'::text], array[\'usercode\'::text, \''+usercode+'\'::text]]) WHERE user_id='+res.rows[0].user_id;
-        await database.pg_query(query);
+        await database.query(query);
         var sequency = await sentences.get_sequency('REQUEST_PASSCODE', obj.options.language);
         var configuration = await config.variables;
         var link = 'https://'+configuration['system|url']+'/#/passcode/'+base.base64encode(passtime)+'/'+base.base64encode(usercode)+'/'+base.base64encode(passcode);
