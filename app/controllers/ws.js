@@ -68,7 +68,11 @@ function process(req, ws) {
         ws.send('fboard function not found: ' + obj.f);
       } else {
         console.log('[' + peer + '] fboard function found: ' + obj.f);
-        operation[obj.f].process(req, ws, obj);
+        try {
+          operation[obj.f].process(req, ws, obj);
+        } catch (e) {
+          console.log(e);
+        }
       }
     } catch (e) {
       console.log('[' + peer +

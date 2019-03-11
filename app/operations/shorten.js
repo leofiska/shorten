@@ -1,42 +1,31 @@
 'use strict';
 var config = require('../../config/config.json');
 var database = require(__dirname + '/../resource/database.js');
-var shortid = require('shortid');
+var uuid = require('short-uuid');
+var translator = uuid();
 var dns = require('dns');
 var validateIP = require('validate-ip-node');
 /* eslint-disable no-new */
-var {ObjectId} = require('mongodb');
-var safeObjectId = s => ObjectId.isValid(s) ? new ObjectId(s) : null;
 var subscribers = [];
 
 module.exports = {
-  process: function(req, ws, obj) {
-    exec(req, ws, obj);
+  process: async function(req, ws, obj) {
+    await exec(req, ws, obj);
   },
 };
 
-var exec = function(req, ws, obj) {
-  database.client.connect(database.url, { useNewUrlParser: true },
-    function(err, db) {
-      setTimeout(destroy.bind(this), 30000, db);
-      if (err) {
-        console.log('something wrong with database connection');
-        ws.send(JSON.stringify({ f: 'create', error: 500 }));
-        return;
-      }
-      switch (obj.options.f) {
-        case 'create':
-          verify_and_create(ws, db, obj);
-          break;
-        default:
-          console.log('no options found');
-          break;
-      }
-    });
-};
+async function exec (req, ws, obj) {
+  switch (obj.options.f) {
+    case 'create':
+      verify_and_create(ws, obj);
+      break;
+    default:
+      console.log('no options found');
+      break;
+  }
+}
 
-function verify_and_create(ws, db, obj) {
-  var dbo = db.db(database.db);
+async function verify_and_create(ws, obj) {
   obj.options.id = obj.options.id.trim().toLowerCase();
   if ( obj.options.id == '' ) {
     ws.send(JSON.stringify({ f: 'create', error: 403, tid: obj.tid }));
@@ -60,31 +49,35 @@ function verify_and_create(ws, db, obj) {
     obj.options.id += par.join('/');
   }
   var tObj = {
-    creator: safeObjectId(ws.token.stoken_id),
+    creator: ws.token.stoken_id,
     url: obj.options.id
   };
-
-  var query = { url: tObj.url };
-  dbo.collection('urls').findOne(query, function(err, doc) {
-    if (err || doc == null) {
-      return create(ws, db, obj);
-    }
-    ws.send(JSON.stringify({
-          f: 'create',
-          error: false,
-          tid: obj.tid,
-          content: {
-            id: 'https://'+config.serverName+'/'+doc.short_url,
-          },
-        }));
-  });
+  var query = 'SELECT * FROM tb_shortener WHERE short_url=\''+tObj.url+'\' LIMIT 1';
+  var res = await database.query(query);
+  if (res === null) {
+    return;
+  }
+  if (res.rowCount !== 1) {
+    return create(ws, obj);
+  }
+  ws.send(JSON.stringify({
+    f: 'create',
+    error: false,
+    tid: obj.tid,
+    content: {
+      id: 'https://'+config.serverName+'/'+translator.fromUUID(res.rows[0].short_uuid),
+    },
+  }));
 };
 
-function create(ws, db, obj) {
-  var dbo = db.db(database.db);
+async function create(ws, obj) {
   var par = obj.options.id.split(/'?\/'?/).filter(function(v) { return v; });
   var domain = par[1];
   var ipv6 = false;
+  var query = '';
+  var res = '';
+  var hash = '';
+
   if (domain.indexOf(']') != -1 && domain.indexOf('[') != -1) {
     domain = domain.substr(1,domain.indexOf(']')-1);
     ipv6 = true;
@@ -101,43 +94,28 @@ function create(ws, db, obj) {
       ws.send(JSON.stringify({ f: 'create', error: 404, tid: obj.tid }));
       return;
     }
-    var hash = '';
-    var gen = function() {
-      hash = shortid.generate();
-      dbo.collection('stoken')
-        .findOne({ short_url: hash }, function(err, result) {
-          if (err) {
-            ws.send(JSON.stringify({ f: 'create', error: 500, tid: obj.tid }));
-            return;
-          }
-          if (result != null) {
-            gen();
-          } else {
-            var tObj = {
-              creator: safeObjectId(ws.token.stoken_id),
-              url: obj.options.id,
-              time: (new Date()),
-              short_url: hash
-            };
-            dbo.collection('urls')
-              .insertOne(tObj, function(err, result) {
-                if (err) {
-                   ws.send(JSON.stringify(
-                   { f: 'create', error: 500, tid: obj.tid }));
-                } else {
-                  ws.send(JSON.stringify({
-                      f: 'create',
-                      error: false,
-                      tid: obj.tid,
-                      content: {
-                        id: 'https://'+config.serverName+'/'+tObj.short_url,
-                      },
-                    }));
-                }
-                destroy(db);
-              });
-          }
-        });
+    var gen = async function() {
+      hash = uuid.uuid();
+      query = 'SELECT * FROM tb_shortener WHERE short_uuid=\''+hash+'\' LIMIT 1';
+      res = await database.query(query);    
+      if (res ===null) {
+        ws.send(JSON.stringify({ f: 'create', error: 500, tid: obj.tid }));
+        return;
+      }
+      if (res.rowCOunt === 1) {
+        return gen();
+      }
+      query = 'INSERT INTO tb_shortener ( short_url, short_uuid, short_session_id ) VALUES '+
+              '( \''+obj.options.id+'\', \''+hash+'\', '+ws.token.stoken_id+' )';
+      res = await database.query(query);
+      ws.send(JSON.stringify({
+        f: 'create',
+        error: false,
+        tid: obj.tid,
+        content: {
+          id: 'https://'+config.serverName+'/'+translator.fromUUID(hash),
+        },
+      }));
     };
     gen();
   });

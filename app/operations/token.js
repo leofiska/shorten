@@ -1,183 +1,132 @@
 'use strict';
-var database = require(__dirname + '/../resource/database.js');
 var crypto = require('crypto');
+var database = require(__dirname + '/../resource/database.js');
+
 module.exports = {
-  process: function(req, ws, obj) {
-    exec(req, ws, obj);
+  process: async function (req, ws, obj) {
+    await exec(req, ws, obj);
   },
 };
 
-var exec = function(req, ws, obj) {
-  database.client.connect(database.url, { useNewUrlParser: true },
-    function(err, db) {
-      if (err) {
-        ws.send(JSON.stringify(
-          { f: 'token', error: 500 }));
-        return;
-      }
-      setTimeout(destroy.bind(this), 30000, db);
-      validate_token(ws, db, obj);
-    });
+var exec = async function (req, ws, obj) {
+  await validate_token(ws, obj);
 };
 
-function validate_token(ws, db, obj) {
-  var dbo = db.db(database.db);
+async function validate_token (ws, obj) {
   if (obj.token === null ||
     obj.token === undefined ||
     obj.token.trim() === '') {
-    create_token(ws, db);
+    create_token(ws);
     return;
   }
-  var query = { token: obj.token };
-  dbo.collection('token').findOne(query, function(err, doc) {
-    if (err) {
-      if (ws.readyState === ws.OPEN) {
-        ws.send(JSON.stringify(
-          { f: 'token', error: 500 }));
-        return;
-      }
-    }
-    if (doc != null) {
-      validate_stoken(ws, db, {
-        _id: doc._id,
-        token: obj.token,
-        stoken: obj.stoken });
-    } else {
-      create_token(ws, db);
-    }
-  });
+  var db_hash = crypto.createHash('sha512').update(obj.token.trim()).digest('hex');
+  var query = 'SELECT global_id FROM tb_global_ids WHERE global_hash=\''+db_hash+'\' LIMIT 1';
+  var res = await database.query(query);
+  if (res === null) {
+    ws.send(JSON.stringify({ f: 'token', error: 500 }));
+    return;
+  }
+  if (res.rowCount !== 1) {
+    await create_token(ws);
+    return;
+  }
+  await validate_stoken(ws, {token_id: res.rows[0].global_id, hash: obj.token, db_hash: db_hash, stoken: obj.stoken})
 }
 
-function validate_stoken(ws, db, obj) {
-  var dbo = db.db(database.db);
+async function validate_stoken (ws, obj) {
   if (obj.stoken === null ||
     obj.stoken === undefined ||
     obj.stoken.trim() === '') {
-    create_stoken(ws, db, obj);
+    create_stoken(ws, obj);
     return;
   }
-  var query = { token: obj._id, stoken: obj.stoken };
-  dbo.collection('stoken').findOne(query, function(err, doc) {
-    if (err) {
-      if (ws.readyState === ws.OPEN) {
-        ws.send(JSON.stringify(
-          { f: 'token', error: 500 }));
-        return;
-      }
-    }
-    if (doc != null) {
-      ws.token = {
-        token_id: obj._id,
-        token: obj.token,
-        stoken_id: doc._id,
-        stoken: obj.stoken,
-      };
-      if (ws.readyState === ws.OPEN)
-        ws.send(JSON.stringify({
-          f: 'token',
-          error: false,
-          content: {
-            token: obj.token,
-            stoken: obj.stoken,
-            id: doc._id,
-          },
-        }));
-      // ws.push('user',user);
-      destroy(db);
-    } else {
-      create_stoken(ws, db, obj);
-    }
-  });
-}
-
-function create_stoken(ws, db, obj) {
-  var dbo = db.db(database.db);
-  var stoken = function() {
-    var hash = crypto.createHmac('sha512', '' + new Date().getTime());
-    hash = hash.digest('hex');
-    dbo.collection('stoken')
-      .findOne({ stoken: hash }, function(err, result) {
-        if (err) {
-          if (ws.readyState === ws.OPEN)
-            ws.send(JSON.stringify(
-              { f: 'token', error: 500 }));
-          return;
-        }
-        if (result != null) {
-          stoken();
-        } else {
-          var iObj = {token: obj._id, stoken: hash};
-          dbo.collection('stoken')
-            .insertOne(iObj, function(err, result) {
-              if (err) {
-                if (ws.readyState === ws.OPEN)
-                  ws.send(JSON.stringify(
-                    { f: 'token', error: 500 }));
-                return;
-              }
-              ws.token = {
-                token_id: obj._id,
-                token: obj.token,
-                stoken_id: iObj._id,
-                stoken: hash,
-              };
-              if (ws.readyState === ws.OPEN)
-                ws.send(JSON.stringify({
-                  f: 'token',
-                  error: false,
-                  content: {
-                    token: obj.token,
-                    stoken: hash,
-                    id: iObj._id,
-                  },
-                }));
-              // ws.push('user',user);
-              destroy(db);
-            });
-        }
-      });
-  };
-  stoken();
-}
-
-function create_token(ws, db) {
-  var dbo = db.db(database.db);
-  var token = function() {
-    var hash = crypto.createHmac('sha512', '' + new Date().getTime());
-    hash = hash.digest('hex');
-    dbo.collection('token')
-      .findOne({ token: hash }, function(err, result) {
-        if (err) {
-          if (ws.readyState === ws.OPEN)
-            ws.send(JSON.stringify(
-              { f: 'token', error: 500 }));
-          return;
-        }
-        if (result != null) {
-          token();
-        } else {
-          var iObj = {token: hash};
-          dbo.collection('token')
-            .insertOne(iObj, function(err, result) {
-              if (err) {
-                if (ws.readyState === ws.OPEN)
-                  ws.send(JSON.stringify(
-                    { f: 'token', error: 500 }));
-                return;
-              }
-              create_stoken(ws, db, iObj);
-            });
-        }
-      });
-  };
-  token();
-}
-
-function destroy(db) {
-  if (db !== undefined && db !== null) {
-    db.close();
-    db.destroy;
-    db = null;
+  var db_hash = crypto.createHash('sha512').update(obj.stoken.trim()).digest('hex');
+  var query = 'SELECT session_id FROM tb_session_ids WHERE session_hash=\''+db_hash+'\' LIMIT 1';
+  var res = await database.query(query);
+  if (res === null) {
+    ws.send(JSON.stringify({ f: 'token', error: 500 }));
+    return;
   }
-};
+  if (res.rowCount !== 1) {
+    create_stoken(ws, obj);
+    return;
+  }
+  ws.token = {
+    token_id: obj.token_id,
+    token: obj.hash,
+    stoken_id: res.rows[0].session_id,
+    stoken: obj.stoken
+  };
+  ws.send(JSON.stringify({
+    f: 'token',
+    error: false,
+    content: {
+      token: obj.hash,
+      stoken: obj.stoken
+    },
+  }));
+}
+
+async function create_stoken (ws, token) {
+  var stoken = async function() {
+    var hash = crypto.createHash('sha512').update('-&^'+(new Date().getTime())).digest('hex');
+    var db_hash = crypto.createHash('sha512').update(hash).digest('hex');
+    var query = 'SELECT session_id FROM tb_session_ids WHERE session_hash=\''+db_hash+'\' LIMIT 1';
+    var res = await database.query(query);
+    if (res === null) {
+      ws.send(JSON.stringify({ f: 'token', error: 500 }));
+      return;
+    }
+    if (res.rowCount === 1) {
+      await stoken();
+      return;
+    }
+    query = 'INSERT INTO tb_session_ids ( session_hash, session_global_id ) VALUES ( \''+db_hash+'\', (SELECT global_id FROM tb_global_ids WHERE global_hash=\''+token.db_hash+'\' LIMIT 1)) RETURNING session_id';
+    res = await database.query(query);
+    if (res === null) {
+      ws.send(JSON.stringify({ f: 'token', error: 500 }));
+      return;
+    }
+    ws.token = {
+      token_id: token.token_id,
+      token: token.hash,
+      stoken_id: res.rows[0].session_id,
+      stoken: hash
+    };
+    ws.send(JSON.stringify({
+      f: 'token',
+      error: false,
+      content: {
+        token: token.hash,
+        stoken: hash
+      }
+    }));
+  };
+  await stoken();
+}
+
+async function create_token (ws) {
+  var token = async function() {
+    var hash = crypto.createHash('sha512').update('-&^'+(new Date().getTime())).digest('hex');
+    var db_hash = crypto.createHash('sha512').update(hash).digest('hex');
+    var query = 'SELECT global_id FROM tb_global_ids WHERE global_hash=\''+db_hash+'\' LIMIT 1';
+    var res = await database.query(query);
+    if (res === null) {
+      ws.send(JSON.stringify({ f: 'token', error: 500 }));
+      return;
+    }
+    if (res.rowCount === 1) {
+      await token();
+      return;
+    }  
+    query = 'INSERT INTO tb_global_ids ( global_hash ) VALUES ( \''+db_hash+'\') RETURNING global_id';
+    res = await database.query(query);
+    if (res === null) {
+      ws.send(JSON.stringify({ f: 'token', error: 500 }));
+      return;
+    }
+    await create_stoken(ws, {token_id: res.rows[0].global_id, db_hash: db_hash, hash: hash});
+  };
+  await token();
+}
 

@@ -23,4 +23,5 @@ database/00.database.sql
 *.pem
 config/config.json
 src/lib/config.json
+app/resource/postgres.json
 

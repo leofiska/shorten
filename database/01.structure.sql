@@ -22,6 +22,16 @@ CREATE TABLE tb_global_id_ipaddress (
 GRANT SELECT, INSERT ( global_id_ipaddress, global_id_ipaddress_global_id, global_id_ipaddress_user_agent ), UPDATE ( global_id_ipaddress_lastseen ) ON tb_global_id_ipaddress TO :var_user;
 GRANT USAGE, SELECT ON SEQUENCE tb_global_id_ipaddress_global_id_ipaddress_id_seq TO :var_user;
 
+DROP TABLE IF EXISTS tb_session_ids;
+CREATE TABLE tb_session_ids (
+  session_id            bigserial PRIMARY KEY,
+  session_hash          varchar(256) NOT NULL UNIQUE,
+  session_global_id     bigint NOT NULL REFERENCES tb_global_ids (global_id) ON DELETE CASCADE,
+  session_time          timestamp DEFAULT CURRENT_TIMESTAMP
+);
+GRANT SELECT, INSERT ( session_hash, session_global_id ) ON tb_session_ids TO :var_user;
+GRANT USAGE, SELECT ON SEQUENCE tb_session_ids_session_id_seq TO :var_user;
+
 DROP TABLE IF EXISTS tb_blocks;
 CREATE TABLE tb_blocks (
   block_ipaddress     varchar(39) NOT NULL,

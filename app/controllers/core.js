@@ -1,12 +1,12 @@
 'use strict';
-var base = require('../resource/base.js');
-var fs = require('fs');
-var path = require('path');
-var mime = require('mime');
+var fs = require('fs')
+var path = require('path')
+var mime = require('mime')
 var database = require(__dirname + '/../resource/database.js');
+var uuid = require('short-uuid');
+var translator = uuid();
 /* eslint-disable no-new */
 var {ObjectId} = require('mongodb');
-var safeObjectId = s => ObjectId.isValid(s) ? new ObjectId(s) : null;
 
 const extensions = {
   loadInBrowser: [ 'image', 'video', 'text' ]
@@ -38,35 +38,31 @@ exports.faviconresource = ( req , res ) => {
   provide_faviconresource(req, res);
 };
 
-exports.redirect = ( req, res ) => {
+exports.redirect = async ( req, res ) => {
   console.log('redirect: '+req.params.shorten);
-  if ( req.header('host') == undefined ) {
+  if ( req.header('host') === undefined ) {
     res.statusCode = 404;
     res.end();
     return;
   }
-  database.client.connect(database.url, { useNewUrlParser: true },
-    function(err, db) {
-      setTimeout(destroy.bind(this), 30000, db);
-      if (err) {
-        res.statusCode = 500;
-        res.end();
-        return;
-      }
-      var dbo = db.db(database.db);
-      var query = { short_url: req.params.shorten };
-      dbo.collection('urls').findOne(query, function(err, doc) {
-        if (err || doc == null) {
-          res.statusCode = 404;
-          res.end();
-          return;
-        }
-        res.writeHead(301, {
-          'Location': doc.url
-        });
-        res.end();
-      });
-    });
+  var query = 'SELECT short_id, short_url FROM tb_shortener WHERE short_uuid=\''+translator.toUUID(req.params.shorten)+'\' LIMIT 1';
+  var ans = await database.query(query);
+  if (ans === null) {
+    res.statusCode = 500;
+    res.end();
+    return;
+  }
+  if (ans.rowCount !== 1) {
+    res.statusCode = 404;
+    res.end();
+    return;
+  }
+  query = 'UPDATE tb_shortener SET short_unique_counter = short_unique_counter + 1 WHERE short_id='+ans.rows[0].short_id;
+  await database.query(query);
+  res.writeHead(301, {
+    'Location': ans.rows[0].short_url
+  });
+  res.end();
 };
 
 function provide_vueresource( req, res ) {
