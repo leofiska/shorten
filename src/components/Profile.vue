@@ -97,10 +97,11 @@ export default {
   props: [
     'title',
     'language',
+    'language_code',
     'user'
   ],
   mounted () {
-    document.title = this.title
+    document.title = this.s.profile + ' | ' + this.title[this.language_code]
   },
   created () {
     for (var i = 0; this.sentences[i] !== undefined; i++) {
@@ -124,6 +125,7 @@ export default {
           break
         }
       }
+      document.title = this.s.profile + ' | ' + this.title[this.language_code]
     },
     'user.attributes.items_per_page': function (newVal, oldVal) {
       if (oldVal === undefined || newVal === undefined) return

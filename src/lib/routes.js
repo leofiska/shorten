@@ -44,6 +44,19 @@ export default {
         guestOnly: false,
         isDisplayed: false
       }
+    },
+    {
+      path: '/passcode/:time/:id/:pass',
+      name: 'passcode',
+      array: 2,
+      component: Passcode,
+      meta:
+      {
+        alwaysVisible: false,
+        requireAuth: false,
+        guestOnly: true,
+        isDisplayed: false
+      }
     }
   ]
 }
