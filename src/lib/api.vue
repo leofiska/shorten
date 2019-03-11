@@ -6,7 +6,8 @@ export default {
     'stoken',
     'ltoken',
     'online',
-    'apiUrl'
+    'apiUrl',
+    'user'
   ],
   render () {
     return {
@@ -14,14 +15,19 @@ export default {
   },
   data () {
     return {
-      bindings: [],
-      subscriptions: [],
+      tid: 0,
+      reconnect: null,
+      bindings: {
+        lock: false,
+        objects: []
+      },
       loading: false,
       socket: null,
       url: 'wss://' + this.apiUrl + '/api',
       createSocket: function () {
         delete this.socket
         this.socket = null
+        this.reconnect = null
         try {
           this.socket = new WebSocket(this.url)
         } catch (e) {
@@ -30,12 +36,7 @@ export default {
         }
         this.socket.onopen = () => {
           this.send({f: 'token', token: this.token, stoken: this.stoken}, true)
-          for (var i = 0; i < this.subscriptions.length; i++) {
-            this.subscribe(this.bindings[this.subscriptions[i] - 1])
-          }
-          if (this.ltoken !== null) {
-            this.send({f: 'auth', ltoken: this.ltoken}, true)
-          }
+          this.send({f: 'auth', ltoken: this.ltoken}, true)
         }
         this.socket.onmessage = (e) => {
           try {
@@ -45,19 +46,24 @@ export default {
           }
         }
         this.socket.onclose = (e) => {
+          this.socket.onerror = function () {}
           this.$emit('setOnline', false)
-          setTimeout(this.createSocket.bind(this), 300)
+          if (this.reconnect === null) {
+            this.reconnect = setTimeout(this.createSocket.bind(this), 300)
+          }
         }
         this.socket.onerror = (e) => {
-          this.$emit('setOnline', false)
           this.socket.onclose = function () {}
+          this.$emit('setOnline', false)
           this.socket.close()
-          setTimeout(this.createSocket.bind(this), 300)
+          if (this.reconnect === null) {
+            this.reconnect = setTimeout(this.createSocket.bind(this), 300)
+          }
         }
       },
       send: function (f, forced) {
         this.$emit('setltoken', sessionStorage.getItem('ltoken') || localStorage.getItem('ltoken'))
-        this.$emit('setlanguage', localStorage.getItem('language'))
+        // this.$emit('setlanguage', localStorage.getItem('language'))
         if (((forced !== undefined && forced === true) || this.online === true) &&
           this.socket &&
           this.socket !== null &&
@@ -76,13 +82,32 @@ export default {
         }
       },
       executeServerMessage: function (obj) {
+        var i = 0
         switch (obj.f) {
           case 'auth':
+            this.$emit('setready', true)
             if (obj.error !== false) {
               this.$emit('setltoken', null)
               sessionStorage.removeItem('ltoken')
               localStorage.removeItem('ltoken')
+              if (this.user !== null) {
+                this.$emit('setuser', null)
+                this.$router.push('/')
+                window.scrollTo(0, 0)
+                this.$emit('setltoken', null)
+              }
             }
+            if (obj.user !== undefined) {
+              this.$emit('setuser', obj.user)
+            }
+            for (i = 0; this.bindings.objects[i] !== undefined; i++) {
+              if (this.bindings.objects[i] !== null && this.bindings.objects[i].options !== undefined && this.bindings.objects[i].options.f === 'subscribe') {
+                this.resubscribe(this.bindings.objects[i])
+              }
+            }
+            break
+          case 'user':
+            this.$emit('setuser', obj.el)
             break
           case 'token':
             if (obj.error !== false) {
@@ -91,6 +116,7 @@ export default {
               localStorage.removeItem('token')
               sessionStorage.removeItem('stoken')
               this.$router.push('/')
+              window.scrollTo(0, 0)
               return
             }
             localStorage.setItem('token', obj.content.token)
@@ -100,11 +126,26 @@ export default {
             this.$emit('setid', obj.content.id)
             this.$emit('setOnline', true)
             break
+          case 'logout':
+            if (obj.error === false) {
+              sessionStorage.removeItem('ltoken')
+              localStorage.removeItem('ltoken')
+              this.$emit('setltoken', null)
+              this.$emit('setuser', null)
+              this.$router.push('/')
+              window.scrollTo(0, 0)
+            }
+            break
           default:
-            // console.log('received')
-            // console.log(obj)
-            if (this.bindings[obj.tid - 1] !== undefined && this.bindings[obj.tid - 1] !== null) {
-              this.bindings[obj.tid - 1].storno(obj).bind(this.bindings[obj.tid - 1].context)
+            if (this.bindings.lock !== false) {
+              setTimeout(this.executeServerMessage.bind(this), 100, obj)
+              return
+            }
+            for (i = 0; this.bindings.objects[i] !== undefined; i++) {
+              if (this.bindings.objects[i].sync.tid === obj.tid) {
+                this.bindings.objects[i].storno(obj).bind(this.bindings.objects[i].context)
+                break
+              }
             }
             break
         }
@@ -124,26 +165,71 @@ export default {
       this.send({ f: 'logout', token: localStorage.getItem('token') })
     },
     fetch: function (request) {
-      if (request.sync.tid < 0) {
-        request.sync.tid = this.bindings.push(request)
+      if (request.sync !== undefined) {
+        if (request.sync.tid < 0) {
+          request.sync.tid = this.bindings.objects.push(request)
+        }
+        this.$emit('setloading', true)
+        this.send({f: request.method, options: request.options, tid: request.sync.tid})
+      } else {
+        this.$emit('setloading', true)
+        this.send({f: request.method, options: request.options})
       }
-      this.send({ f: request.method, options: request.options, tid: request.sync.tid })
+    },
+    setlanguage: function (language, languageCode) {
+      this.send({f: 'user', options: {f: 'setlanguage', language: language, language_code: languageCode}})
     },
     subscribe: function (request) {
-      if (!this.online) {
+      if (this.online === false || this.bindings.lock === true) {
         setTimeout(this.subscribe.bind(this), 100, request)
         return
       }
-      if (request.sync.tid < 0) {
-        request.sync.tid = this.bindings.push(request)
-        this.subscriptions.push(request.sync.tid)
+      this.bindings.lock = true
+      request.sync.tid = this.tid++
+      this.bindings.objects.push(request)
+      this.bindings.lock = false
+      if (request.sync.filter !== undefined && request.sync.filter.search !== undefined && request.sync.filter.search !== null && request.sync.filter.search.trim() !== '') {
+        request.options.search = request.sync.filter.search.trim()
+      }
+      this.send({ f: request.method, options: request.options, tid: request.sync.tid })
+    },
+    resubscribe: function (request) {
+      if (this.online === false) {
+        setTimeout(this.resubscribe.bind(this), 100, request)
+        return
+      }
+      if (request.sync.filter !== undefined && request.sync.filter.search !== undefined && request.sync.filter.search !== null && request.sync.filter.search.trim() !== '') {
+        request.options.search = request.sync.filter.search.trim()
       }
       this.send({ f: request.method, options: request.options, tid: request.sync.tid })
     },
     unsubscribe: function (request) {
-      this.bindings[request.sync.tid - 1] = null
-      this.subscriptions.splice(this.subscriptions.indexOf(request.sync.tid), 1)
+      if (this.online === false || this.bindings.lock === true) {
+        setTimeout(this.unsubscribe.bind(this), 100, request)
+        return
+      }
+      this.bindings.lock = true
+      for (var i = 0; this.bindings.objects[i] !== undefined; i++) {
+        if (this.bindings.objects[i].sync.tid === request.sync.tid) {
+          this.bindings.objects[i] = null
+          break
+        }
+      }
+      var tmp = this.bindings.objects
+      this.bindings.objects = tmp.filter(function (el) {
+        return el != null
+      })
+      tmp = null
+      this.bindings.lock = false
       this.send({ f: request.method, options: request.options, tid: request.sync.tid })
+    }
+  },
+  watch: {
+    ltoken: function (newVal, oldVal) {
+      this.send({f: 'auth', ltoken: this.ltoken}, true)
+      if (newVal === null) {
+        this.$router.push('/')
+      }
     }
   }
 }
