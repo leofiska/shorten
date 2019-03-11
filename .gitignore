@@ -22,4 +22,5 @@ database/00.database.sql
 *.key
 *.pem
 config/config.json
+src/lib/config.json
 
