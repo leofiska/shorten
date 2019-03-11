@@ -19,13 +19,13 @@ router.beforeEach((to, from, next) => {
     next({name: 'home'})
   }
   if (to.matched.some(record => record.meta.requireAuth)) {
-    if (localStorage.getItem('ltoken') !== null) {
+    if (localStorage.getItem('ltoken') !== null || sessionStorage.getItem('ltoken') !== null) {
       next()
     } else {
       next({name: 'home'})
     }
   } else if (to.matched.some(record => record.meta.guestOnly)) {
-    if (localStorage.getItem('ltoken') == null) {
+    if (localStorage.getItem('ltoken') === null && sessionStorage.getItem('ltoken') === null) {
       next()
     } else {
       next({ name: 'home' })

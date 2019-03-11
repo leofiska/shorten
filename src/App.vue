@@ -1,13 +1,25 @@
 <template>
   <div>
-    <v-api ref='api' :apiUrl="apiUrl" :id="id" @setid="id = $event" :token="token" @settoken="token = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :stoken="stoken" @setstoken="stoken = $event" @setlanguage="language = $event" :online="online" @setOnline="online = $event" :language="language" />
-    <Navigator :token="token" @settoken="token = $event" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" @fetch="fetch" />
-    <Login v-if="ltoken === null" :language="language" :online="online" @fetch="fetch" @setloading="loading = $event" @setltoken="ltoken = $event" />
-    <Loading v-if="this.loading" :loading="this.loading" language="language" />
-    <div id="app">
-      <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setloading="loading = $event"  :language="language" />
+    <v-api ref='api' :user="user" @setuser="setuser" :apiUrl="apiUrl" :id="id" @setid="id = $event" :token="token" @setready="ready = $event" @settoken="token = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :language="language" :language_code="language_code" />
+    <div v-if="this.ready === true">
+      <Navigator :token="token" @settoken="token = $event" :user="user" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" @fetch="fetch" :language_code="language_code" />
+      <Login v-if="ltoken === null" :language="language" :language_code="language_code" :online="online" @fetch="fetch" @setloading="loading = $event" @setltoken="ltoken = $event" />
+      <Loading v-if="this.loading" :loading="this.loading" :language="language" />
+      <div id="app" v-if="(this.$route.meta.alwaysVisible || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions === undefined) || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions !== undefined && this.$route.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!this.$route.meta.requireAuth && ((user === null && this.$route.meta.guestOnly) || !this.$route.meta.guestOnly)))">
+        <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :user="user"  :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setltoken="ltoken = $event" @setloading="loading = $event"  :language="language" :language_code="language_code" />
+      </div>
+      <div id="app" v-else>
+        {{this.s.notallowed}}
+      </div>
+      <Footer :language="language" :language_code="language_code" @setlanguage="setlanguage" :title="title" />
     </div>
-    <Footer :language="language" @setlanguage="language = $event" :title="title" />
+    <div v-else style='width: 100vw; height: 100vh; margin: 0; padding: 0; display: table;'>
+      <div style='display: table-row;'>
+        <div style='display: table-cell; vertical-align: middle; text-align: center;'>
+          {{this.s.loading}}
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -23,27 +35,62 @@ export default {
   name: 'App',
   data () {
     return {
+      ready: false,
       baseUrl: config.baseUrl,
       apiUrl: config.apiUrl,
       loading: false,
       id: null,
+      user: null,
       token: localStorage.getItem('token'),
       stoken: sessionStorage.getItem('stoken'),
       ltoken: sessionStorage.getItem('ltoken') || localStorage.getItem('ltoken'),
-      // ltoken: localStorage.getItem('ltoken'),
       online: false,
       title: config.title,
-      language: navigator.language.toLowerCase(),
+      language: null,
+      language_code: null,
       menu: {
-        alt: 'sho.ovh',
+        alt: 'sias',
         img: {
-          src: 'favicon-32x32.png'
+          src: 'favicons/favicon-32x32.png'
         }
+      },
+      sentences: [
+        {
+          alias: 'en-us',
+          content:
+          {
+            notallowed: 'You don\'t have permission to access this page',
+            loading: 'Loading'
+          }
+        },
+        {
+          alias: 'pt-br',
+          content:
+          {
+            notallowed: 'Você não tem permissão para ver esta página',
+            loading: 'Carregando'
+          }
+        }
+      ],
+      s: {
       }
     }
   },
   beforeCreate () {
-    document.title = this.title
+  },
+  created () {
+    if (this.user === null) {
+      this.setlanguage(navigator.language.toLowerCase())
+    }
+    for (var i = 0; this.sentences[i] !== undefined; i++) {
+      if (this.sentences[i].alias === this.language) {
+        this.s = this.sentences[i].content
+        return
+      }
+    }
+    this.s = this.sentences[0].content
+  },
+  mounted () {
   },
   components: {
     Navigator,
@@ -54,16 +101,85 @@ export default {
   methods: {
     setlanguage (nl) {
       this.language = nl
-      console.log(this.ttoken)
+      switch (nl) {
+        case 'pt-br':
+          this.language_code = 1046
+          break
+        case 'en-us':
+          this.language_code = 1033
+          break
+        default:
+          this.language_code = 1033
+          nl = 'en-us'
+          break
+      }
+      localStorage.setItem('language', nl)
+      if (this.user !== null) {
+        this.$refs.api.setlanguage(this.language, this.language_code)
+      }
     },
     fetch (request) {
-      this.$refs.api.fetch(request)
+      if (this.$refs.api !== undefined) {
+        this.loading = true
+        this.$refs.api.fetch(request)
+      }
     },
     subscribe (request) {
-      this.$refs.api.subscribe(request)
+      if (this.$refs.api !== undefined) {
+        this.loading = true
+        this.$refs.api.subscribe(request)
+      }
     },
     unsubscribe (request) {
-      this.$refs.api.unsubscribe(request)
+      if (this.$refs.api !== undefined) {
+        this.$refs.api.unsubscribe(request)
+      }
+    },
+    setuser (u) {
+      this.user = u
+      if (this.user !== null) {
+        localStorage.setItem('language', this.user.language.code)
+        this.language = this.user.language.code
+        this.language_code = this.user.language.codeset
+      }
+    }
+  },
+  computed: {
+    routes () {
+      return this.$router.options.routes
+    }
+  },
+  watch: {
+    '$route.path': function (newVal, oldVal) {
+      this.loading = false
+      /* eslint-disable */
+      if (this.$route.meta.alwaysVisible === true ||
+        (this.$route.meta.requireAuth && this.user !== null && this.$route.meta.permissions === undefined) ||
+        (this.$route.meta.requireAuth && this.user !== null && this.$route.meta.permissions !== undefined && this.$route.meta.permissions.filter(value => -1 !== this.user.permissions.indexOf(value)).length !== 0) ||
+        (!this.$route.meta.requireAuth && ((this.user === null && this.$route.meta.guestOnly) || !this.$route.meta.guestOnly))
+      ) {
+      } else {
+        this.$router.push('/')
+      }
+    },
+    'ready': function () {
+      /* eslint-disable */
+      if (this.$route.meta.alwaysVisible === true ||
+        (this.$route.meta.requireAuth && this.user !== null && this.$route.meta.permissions === undefined) ||
+        (this.$route.meta.requireAuth && this.user !== null && this.$route.meta.permissions !== undefined && this.$route.meta.permissions.filter(value => -1 !== this.user.permissions.indexOf(value)).length !== 0) ||
+        (!this.$route.meta.requireAuth && ((this.user === null && this.$route.meta.guestOnly) || !this.$route.meta.guestOnly))
+      ) {
+      } else {
+        this.$router.push('/')
+      }
+    },
+    language: function (newVal, oldVal) {
+      for (var i = 0; this.sentences[i] !== undefined; i++) {
+        if (this.sentences[i].alias === newVal) {
+          this.s = this.sentences[i].content
+          break
+        }
+      }
     }
   }
 }
@@ -80,5 +196,12 @@ export default {
   min-height: 100vh;
   position: relative;
   z-index: 1000;
+}
+*:not(input) {
+  -webkit-user-select:none;
+  -khtml-user-select:none;
+  -moz-user-select:none;
+  -o-user-select:none;
+  user-select:none;
 }
 </style>

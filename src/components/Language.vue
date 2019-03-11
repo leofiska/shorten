@@ -8,7 +8,8 @@
 export default {
   name: 'language',
   props: [
-    'language'
+    'language',
+    'language_code'
   ],
   data () {
     return {
@@ -48,15 +49,24 @@ export default {
       var el = document.getElementById('lang' + this.language)
       if (el) el.style.display = ''
       this.$emit('setlanguage', nl)
-      localStorage.setItem('language', nl)
+      this.update_language_bar(nl)
+    },
+    update_language_bar: function (nl) {
       for (var i = 0; this.languages[i] !== undefined; i++) {
         if (this.languages[i].alias === nl) {
           this.s.language = this.languages[i].name
-          el = document.getElementById('lang' + nl)
+          var el = document.getElementById('lang' + nl)
           if (el) el.style.display = 'none'
           return
         }
       }
+    }
+  },
+  watch: {
+    language: function (newVal, oldVal) {
+      var el = document.getElementById('lang' + oldVal)
+      if (el) el.style.display = ''
+      this.update_language_bar(newVal)
     }
   }
 }

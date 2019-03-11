@@ -1,8 +1,7 @@
 <template>
   <div>
-    <h2>{{title}}</h2>
-    <h4>{{s.about}}</h4>
-    <div class='container text-center text-md-left'>
+    <h2>{{title[this.language_code]}}</h2>
+    <div class='container text-center text-md-left pt-5 mt-5'>
       <p>{{s.description_1}}</p>
       <br />
       <p>{{s.description_2}}</p>
@@ -42,10 +41,11 @@ export default {
   },
   props: [
     'title',
-    'language'
+    'language',
+    'language_code'
   ],
   mounted () {
-    document.title = this.title
+    document.title = this.s.about + ' | ' + this.title[this.language_code]
   },
   created () {
     for (var i = 0; this.sentences[i] !== undefined; i++) {
@@ -69,6 +69,7 @@ export default {
           break
         }
       }
+      document.title = this.s.about + ' | ' + this.title[this.language_code]
     }
   }
 }

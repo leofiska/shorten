@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h2>{{title}}</h2>
+    <h2>{{title[this.language_code]}}</h2>
     <p>{{s.description}}</p>
-    <div class='container text-center text-md-left position-relative'>
+    <div class='container text-center text-md-left position-relative pt-5 mt-5'>
       <b-form @submit="onSubmit">
         <b-input-group>
           <b-form-input v-model="original_url" :placeholder="s.type_url"></b-form-input>
@@ -112,10 +112,11 @@ export default {
     'token',
     'loading',
     'online',
-    'language'
+    'language',
+    'language_code'
   ],
   mounted () {
-    document.title = this.title
+    document.title = this.title[this.language_code]
   },
   created () {
     for (var i = 0; this.sentences[i] !== undefined; i++) {
@@ -174,6 +175,7 @@ export default {
           break
         }
       }
+      document.title = this.s.about + ' | ' + this.title[this.language_code]
     }
   }
 }

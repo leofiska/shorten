@@ -1,7 +1,49 @@
 <template>
   <div>
-    <h2>{{title}}</h2>
-    <h5>{{s.profile}}</h5>
+    <h2 v-if="this.user !== null" >{{s.profile}}: {{this.user.username}}</h2>
+    <br />
+    <b-container v-if="this.user !== null">
+      <b-row>
+        <b-col md="6" class="text-right">
+          {{this.s.username}} :
+        </b-col>
+        <b-col md="6" class="text-left">
+          {{this.user.username}}
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col md="6" class="text-right">
+          {{this.s.email}} :
+        </b-col>
+        <b-col md="6" class="text-left">
+          {{this.user.email}}
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col md="6" class="text-right">
+          {{this.s.firstname}} :
+        </b-col>
+        <b-col md="6" class="text-left">
+          {{this.user.firstname}}
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col md="6" class="text-right">
+          {{this.s.lastname}} :
+        </b-col>
+        <b-col md="6" class="text-left">
+          {{this.user.lastname}}
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col md="6" class="text-right">
+          {{this.s.itemsperpage}} :
+        </b-col>
+        <b-col md="6" class="text-left">
+          <b-form-select :options="page_options" v-model="user.attributes.items_per_page" />
+        </b-col>
+      </b-row>
+    </b-container>
   </div>
 </template>
 
@@ -11,31 +53,51 @@ export default {
   name: 'profile',
   data () {
     return {
+      page_options: [
+        10,
+        20,
+        50
+      ],
       sentences: [
         {
           alias: 'en-us',
           content:
           {
+
+            clear_tooltip: 'clears all',
+            email: 'email',
+            firstname: 'first name',
+            fullname: 'fullname',
+            itemsperpage: 'items per page',
+            lastname: 'last name',
             profile: 'Profile',
-            clear_tooltip: 'clears all'
+            username: 'username'
           }
         },
         {
           alias: 'pt-br',
           content:
           {
+            clear_tooltip: 'limpar tudo',
+            email: 'e-mail',
+            firstname: 'primeiro nome',
+            fullname: 'nome',
+            itemsperpage: 'itens por página',
+            lastname: 'sobrenome',
             profile: 'Perfil',
-            clear_tooltip: 'limpar tudo'
+            username: 'nome do usuário'
           }
         }
       ],
       s: {
-      }
+      },
+      items: { tid: -1, elements: [] }
     }
   },
   props: [
     'title',
-    'language'
+    'language',
+    'user'
   ],
   mounted () {
     document.title = this.title
@@ -62,6 +124,12 @@ export default {
           break
         }
       }
+    },
+    'user.attributes.items_per_page': function (newVal, oldVal) {
+      if (oldVal === undefined || newVal === undefined) return
+      if (newVal === oldVal) return
+      this.user.attributes.itemsperpage = newVal
+      this.$emit('fetch', { method: 'user', options: { f: 'set_attribute', attribute: 'items_per_page', value: newVal } })
     }
   }
 }

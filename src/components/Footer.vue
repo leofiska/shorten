@@ -3,7 +3,7 @@
       <div class="container text-center text-md-left">
         <div class="row">
           <div class="col-md-4 mx-auto text-center">
-            <h5 class="font-weight-bold mt-3 mb-4">{{title}}</h5>
+            <h5 class="font-weight-bold mt-3 mb-4">{{title[this.language_code]}}</h5>
             <p>{{s.simplify}}</p>
           </div>
           <hr class="d-md-none">
@@ -78,7 +78,8 @@ export default {
   },
   props: [
     'title',
-    'language'
+    'language',
+    'language_code'
   ],
   created () {
     for (var i = 0; this.sentences[i] !== undefined; i++) {
