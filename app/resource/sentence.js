@@ -9,7 +9,7 @@ module.exports = {
 async function get_sentence (alias, language) {
   try {
     var query = 'SELECT * FROM get_sentence_sequency( \''+alias+'\', \''+language+'\' ) as (sentence_alias text, sentence_value text)';
-    var res = await database.pg_query(query);
+    var res = await database.query(query);
     if (res.rowCount !== 1) {
       return null;
     }
@@ -22,8 +22,7 @@ async function get_sentence (alias, language) {
 async function get_sentence_sequency (alias, language) {
   try {
     var query = 'SELECT * FROM get_sentence_sequency( \''+alias+'\', \''+language+'\' ) as (sentence_alias text, sentence_value text)';
-    console.log(query);
-    var res = await database.pg_query(query);
+    var res = await database.query(query);
     if (res.rowCount < 1) {
       return null;
     }

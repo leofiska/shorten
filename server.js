@@ -10,6 +10,8 @@ var ws = require('express-ws');
 // configure spdy
 var listenConfig = require(__dirname + '/config/listen.js');
 var app = express();
+var emails = require(__dirname + '/app/controllers/emails.js');
+var tasks = require(__dirname + '/app/controllers/tasks.js');
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -18,6 +20,11 @@ app.use(cookieParser());
 app.disable('x-powered-by');
 
 var servers = [];
+var services = [];
+
+services.push(emails.start());
+services.push(tasks.start());
+
 for (var i = 0; listenConfig.serverListenAddresses[i] != undefined; i++) {
 
   // listen for requests and enable some SSL tricks

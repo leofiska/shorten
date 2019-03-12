@@ -6,7 +6,6 @@ var sentences = require(__dirname + '/../resource/sentence.js');
 var config = require(__dirname + '/../resource/config.js');
 var crypto = require('crypto');
 var shortid = require('shortid');
-var { Client } = require('pg');
 var subscriber_handlers = [];
 var subscribers = [];
 
@@ -46,6 +45,7 @@ var exec = async function(req, ws, obj) {
         await database.query(query);
         notify(ws.user.user_id);
       } catch (e) {
+        console.log(e);
         ws.send({f: 'user', error: 500});
       }
 //      console.log(query);
@@ -131,24 +131,20 @@ function create_obj (ws, row) {
   return ans;
 }
 
-function notify (user_id) {
+async function notify (user_id) {
   if (user_id === null || user_id === undefined || user_id === '') return;
   if (subscribers[user_id] === undefined) return;
   if (subscribers[user_id].length < 1) return;
-  var client = new Client(database.pg_options);
-  client.connect();
-  setTimeout(database.pg_destroy.bind(this), 30000, client);
   var query = 'SELECT '+query_elements+
               ' FROM v_users WHERE user_id=\''+user_id+'\' LIMIT 1';
   // console.log(query);
-  client.query(query, (err, res) => {
-    if (!err) {
-      for (var i = 0; subscribers[user_id][i] != undefined; i++) {
-        var ans = create_obj(subscribers[user_id][i].ws, res.rows[0]);
-        subscribers[user_id][i].ws.send({f: 'user', el: ans});
-      }
+  var res = await database.query(query);
+  if (res !== null) {
+    for (var i = 0; subscribers[user_id][i] != undefined; i++) {
+      var ans = create_obj(subscribers[user_id][i].ws, res.rows[0]);
+      subscribers[user_id][i].ws.send({f: 'user', el: ans});
     }
-  });
+  }
 }
 
 function subscribe (ws) {

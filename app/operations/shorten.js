@@ -52,7 +52,14 @@ async function verify_and_create(ws, obj) {
     creator: ws.token.stoken_id,
     url: obj.options.id
   };
-  var query = 'SELECT * FROM tb_shortener WHERE short_url=\''+tObj.url+'\' LIMIT 1';
+  var query = 'SELECT * FROM tb_shortener WHERE short_url=\''+tObj.url+'\'';
+  if (ws.user !== null && ws.user.user_id !== undefined) {
+    query += ' AND short_user_id='+ws.user.user_id;
+  } else {
+    query += ' AND short_global_id='+ws.token.token_id;
+  }
+  query += ' LIMIT 1';
+  console.log(query);
   var res = await database.query(query);
   if (res === null) {
     return;
@@ -105,8 +112,13 @@ async function create(ws, obj) {
       if (res.rowCOunt === 1) {
         return gen();
       }
-      query = 'INSERT INTO tb_shortener ( short_url, short_uuid, short_session_id ) VALUES '+
-              '( \''+obj.options.id+'\', \''+hash+'\', '+ws.token.stoken_id+' )';
+      if (ws.user !== null && ws.user.user_id !== undefined) { 
+        query = 'INSERT INTO tb_shortener ( short_url, short_uuid, short_user_id ) VALUES '+
+                '( \''+obj.options.id+'\', \''+hash+'\', '+ws.user.user_id+' )';
+      } else {
+        query = 'INSERT INTO tb_shortener ( short_url, short_uuid, short_global_id ) VALUES '+
+                '( \''+obj.options.id+'\', \''+hash+'\', '+ws.token.token_id+' )';
+      }
       res = await database.query(query);
       ws.send(JSON.stringify({
         f: 'create',

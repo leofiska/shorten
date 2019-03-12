@@ -13,6 +13,8 @@ async function exec (req, ws, obj) {
     ws.send(JSON.stringify( { f: 'logout', error: 500, tid: obj.tid } ));
     return;
   }
-  var query = 'DELETE FROM tb_user_auth WHEER user_auth_hash=\''+ws.user.auth.sid+'\'';
+  var bd_hash = crypto.createHash('sha512').update(ws.user.auth.sid).digest('hex');
+  var query = 'DELETE FROM tb_user_auth WHEER user_auth_hash=\''+bd_hash+'\'';
   await database.query(query);
+  ws.send(JSON.stringify( { f: 'logout', error: false, tid: obj.tid } ));
 };

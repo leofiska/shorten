@@ -27,6 +27,7 @@
     "jquery": "^3.3.1",
     "mime": "^2.3.1",
     "mongodb": "^3.1.4",
+    "nodejs-base64": "^1.0.3",
     "nodemailer": "^5.1.1",
     "nodemon": "^1.18.4",
     "ocsp": "^1.2.0",
