@@ -160,10 +160,6 @@ export default {
       if (id === undefined || pass === undefined || id === '' || pass === '') return false
       this.send({ f: 'login', id: id, pass: pass })
     },
-    logout: function () {
-      if (localStorage.getItem('token') === null || localStorage.getItem('token') === undefined) return false
-      this.send({ f: 'logout', token: localStorage.getItem('token') })
-    },
     fetch: function (request) {
       if (request.sync !== undefined) {
         if (request.sync.tid < 0) {
