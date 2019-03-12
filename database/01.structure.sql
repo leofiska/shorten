@@ -254,7 +254,7 @@ CREATE TABLE tb_user_auth (
   user_auth_global_id       bigint NOT NULL REFERENCES tb_global_ids ( global_id ) ON DELETE RESTRICT,
   user_auth_active          boolean NOT NULL DEFAULT true
 );
-GRANT SELECT, INSERT ( user_auth_user_id, user_auth_hash, user_auth_global_id ), UPDATE ( user_auth_last_used, user_auth_active ) ON tb_user_auth TO :var_user;
+GRANT SELECT, DELETE, INSERT ( user_auth_user_id, user_auth_hash, user_auth_global_id ), UPDATE ( user_auth_last_used, user_auth_active ) ON tb_user_auth TO :var_user;
 GRANT USAGE, SELECT ON SEQUENCE tb_user_auth_user_auth_id_seq TO :var_user;
 
 DROP TABLE IF EXISTS tb_user_states;

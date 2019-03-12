@@ -45,23 +45,28 @@ exports.redirect = async ( req, res ) => {
     res.end();
     return;
   }
-  var query = 'SELECT short_id, short_url FROM tb_shortener WHERE short_uuid=\''+translator.toUUID(req.params.shorten)+'\' LIMIT 1';
-  var ans = await database.query(query);
-  if (ans === null) {
-    res.statusCode = 500;
-    res.end();
-    return;
+  try {
+    var query = 'SELECT short_id, short_url FROM tb_shortener WHERE short_uuid=\''+translator.toUUID(req.params.shorten)+'\' LIMIT 1';
+    var ans = await database.query(query);
+    if (ans === null) {
+      res.statusCode = 500;
+      res.end();
+      return;
+    }
+    if (ans.rowCount !== 1) {
+      res.statusCode = 404;
+      res.end();
+      return;
+    }
+    query = 'UPDATE tb_shortener SET short_unique_counter = short_unique_counter + 1 WHERE short_id='+ans.rows[0].short_id;
+    await database.query(query);
+    res.writeHead(301, {
+      'Location': ans.rows[0].short_url
+    });
+  } catch (e) {
+    console.log('invalid redirect request: ' +req.params.shorten);
+    writeError(res, 404);
   }
-  if (ans.rowCount !== 1) {
-    res.statusCode = 404;
-    res.end();
-    return;
-  }
-  query = 'UPDATE tb_shortener SET short_unique_counter = short_unique_counter + 1 WHERE short_id='+ans.rows[0].short_id;
-  await database.query(query);
-  res.writeHead(301, {
-    'Location': ans.rows[0].short_url
-  });
   res.end();
 };
 
@@ -185,3 +190,30 @@ function destroy(con) {
     con = null;
   }
 };
+
+function writeError (res, error) {
+  switch(error) {
+    case 404:
+      res.setHeader('Content-Type','text/html; charset=utf8' );
+      res.writeHead(404);
+      res.statusCode = 404;
+      break;
+    case 500:
+    default:
+      res.setHeader('Content-Type','text/html; charset=utf8' );
+      res.writeHead(500);
+      res.statusCode = 500;
+      break;
+  }
+}
+
+function templateError () {
+  var ret = '<html>\r\n'+
+    '  <head>\r\n'+
+    '  </head>\r\n'+
+    '  <body>\r\n'+
+    '  </body>\r\n'+
+    '</html>\r\n';
+  return ret;
+}
+

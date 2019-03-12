@@ -7,7 +7,7 @@ fs.readdir(__dirname + '/../operations/', function(err, files) {
   if (err) return;
   files.forEach(function(file) {
     var name = file.substr(0, file.indexOf('.'));
-    console.log('loaded fboard operation: ' + name);
+    console.log('loaded operation: ' + name);
     operation[name] = require(__dirname + '/../operations/' + file);
   });
 });
@@ -34,6 +34,7 @@ function process(req, ws) {
       username: '',
       email: '',
       id: '',
+      permissions: '',
       is_admin: '',
       auth: {
         sid: '',
@@ -44,11 +45,15 @@ function process(req, ws) {
     stoken: null,
     ltoken: null,
     send: function(msg) {
-      if (this.handler.readyState === this.handler.OPEN)
-        if (typeof msg === 'string' || msg instanceof String)
-          this.handler.send(msg);
-        else
-          this.handler.send(JSON.stringify(msg));
+      try {
+        if (this.handler.readyState === this.handler.OPEN)
+          if (typeof msg === 'string' || msg instanceof String)
+            this.handler.send(msg);
+          else
+            this.handler.send(JSON.stringify(msg));
+      } catch (e) {
+        console.log(e);
+      }
     },
     close: function() {
       this.handler.close();
@@ -65,9 +70,9 @@ function process(req, ws) {
       }
       if (operation[obj.f] === undefined) {
         console.log('[' + peer + '] operation not found: ' + obj.f);
-        ws.send('fboard function not found: ' + obj.f);
+        ws.send({f: obj.f, error: 500, tid: obj.tid, content: {}});
       } else {
-        console.log('[' + peer + '] fboard function found: ' + obj.f);
+        console.log('[' + peer + '] function found: ' + obj.f);
         try {
           operation[obj.f].process(req, ws, obj);
         } catch (e) {

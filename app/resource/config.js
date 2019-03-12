@@ -12,7 +12,7 @@ module.exports = {
 async function get_variables () {
   try {
     var query = 'SELECT json_build_object(\'name\', config_name, \'value\', config_value) as config FROM tb_config';
-    var res = await database.pg_query(query);
+    var res = await database.query(query);
     var els = [];
     for (var i = 0; res.rows[i] !== undefined; i++) {
       els[res.rows[i].config.name] = res.rows[i].config.value;

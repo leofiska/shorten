@@ -86,7 +86,8 @@ async function exec (req, ws, obj) {
           params.time = base.base64decode(obj.options.time);
           params.keep = obj.options.keep;
           query = 'SELECT * FROM tb_users WHERE user_attributes->\'usercode\'=\''+params.id+'\' AND user_attributes->\'passtime\'=\''+params.time+'\' AND user_attributes->\'passcode\'=\''+params.passcode+'\' AND (REGEXP_REPLACE(COALESCE(user_attributes->\'passtime\', \'0\'), \'[^0-9]*\' ,\'0\')::integer + 300) > '+Math.floor(Date.now() / 1000)+' LIMIT 1';
-          var step1 = await database.pg_query(query);
+          console.log(query);
+          var step1 = await database.query(query);
           if (step1.rowCount !== 1) {
             ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 404, tid: obj.tid }));
             return;
@@ -95,7 +96,7 @@ async function exec (req, ws, obj) {
             hash = crypto.createHash('sha256').update('-&^'+(new Date().getTime())).digest('hex');
             bd_hash = crypto.createHash('sha512').update(hash).digest('hex');
             query = 'SELECT user_auth_id FROM tb_user_auth WHERE user_auth_hash=\''+bd_hash+'\' LIMIT 1';
-            res = await database.pg_query(query);
+            res = await database.query(query);
             if (res.rowCount !== 0) {
               auth();
               return;
@@ -103,13 +104,13 @@ async function exec (req, ws, obj) {
               //must add user_auth_global_id
             query = 'INSERT INTO tb_user_auth ( user_auth_user_id, user_auth_hash, user_auth_global_id ) VALUES '+
                     '( \''+step1.rows[0].user_id+'\', \''+bd_hash+'\', \''+ws.token.token_id+'\' )';
-            res = await database.pg_query(query);
+            res = await database.query(query);
             query = 'UPDATE tb_users SET user_attributes = delete(user_attributes, \'passcode\')';
-            res = await database.pg_query(query);
+            res = await database.query(query);
             query = 'UPDATE tb_users SET user_attributes = delete(user_attributes, \'passtime\')';
-            res = await database.pg_query(query);
+            res = await database.query(query);
             query = 'UPDATE tb_users SET user_attributes = delete(user_attributes, \'usercode\')';
-            res = await database.pg_query(query);
+            res = await database.query(query);
             ws.send(JSON.stringify(
             {
               f: 'login_password',
@@ -128,6 +129,7 @@ async function exec (req, ws, obj) {
           }
           auth();
         } catch (e) {
+          console.log(e);
           ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 404, tid: obj.tid }));
           return;
         }
@@ -138,7 +140,7 @@ async function exec (req, ws, obj) {
           params.passcode = obj.options.pass;
           params.keep = obj.options.keep;
           query = 'SELECT * FROM tb_users WHERE (user_primaryemail_hashed = \''+params.id+'\' OR user_nickname_hashed=\''+params.id+'\') AND user_attributes->\'passcode\'=\''+params.passcode+'\' AND (REGEXP_REPLACE(COALESCE(user_attributes->\'passtime\', \'0\'), \'[^0-9]*\' ,\'0\')::integer + 300) > '+Math.floor(Date.now() / 1000)+' LIMIT 1';
-          var step1 = await database.pg_query(query);
+          var step1 = await database.query(query);
           if (step1.rowCount !== 1) {
             ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 404, tid: obj.tid }));
             return;
@@ -147,20 +149,20 @@ async function exec (req, ws, obj) {
             hash = crypto.createHash('sha256').update('-&^'+(new Date().getTime())).digest('hex');
             bd_hash = crypto.createHash('sha512').update(hash).digest('hex');
             query = 'SELECT user_auth_id FROM tb_user_auth WHERE user_auth_hash=\''+bd_hash+'\' LIMIT 1';
-            res = await database.pg_query(query);
+            res = await database.query(query);
             if (res.rowCount !== 0) {
               auth();
               return;
             }
             query = 'INSERT INTO tb_user_auth ( user_auth_user_id, user_auth_hash, user_auth_global_id ) VALUES '+
                     '( \''+step1.rows[0].user_id+'\', \''+bd_hash+'\', \''+ws.token.token_id+'\' )';
-            res = await database.pg_query(query);
+            res = await database.query(query);
             query = 'UPDATE tb_users SET user_attributes = delete(user_attributes, \'passcode\')';
-            res = await database.pg_query(query);
+            res = await database.query(query);
             query = 'UPDATE tb_users SET user_attributes = delete(user_attributes, \'passtime\')';
-            res = await database.pg_query(query);
+            res = await database.query(query);
             query = 'UPDATE tb_users SET user_attributes = delete(user_attributes, \'usercode\')';
-            res = await database.pg_query(query);
+            res = await database.query(query);
             ws.send(JSON.stringify(
             {
               f: 'login_password',

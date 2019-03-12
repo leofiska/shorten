@@ -12,7 +12,7 @@ module.exports = {
 }
 
 var mailOptions = {
-  from: 'no-reply@rd-a.xyz',
+  from: 'no-reply@sho.ovh',
 };
 
 var signature = '';
@@ -31,8 +31,8 @@ async function schedule_email (to, subject, content, html, language, signature) 
   if (language === undefined || language === null) language = 1033;
   try {
     var query = 'INSERT INTO tb_emails ( email_subject, email_from, email_reply_to, email_html, email_text, email_language, email_signature ) VALUES '+
-              '( \''+subject+'\', \'no-reply@rd-a.xyz\', \'leonardo.fischer@atos.net\', true, \''+content.replace('\'','\'\'')+'\', (SELECT language_id FROM tb_languages WHERE language_codeset=REGEXP_REPLACE(COALESCE(\''+language+'\', \'0\'), \'[^0-9]*\' ,\'0\')::integer OR language_code=\''+language+'\' LIMIT 1), true ) RETURNING email_id';
-    var res = await database.pg_query(query);
+              '( \''+subject+'\', \'no-reply@sho.ovh\', \'leonardo.fischer@atos.net\', true, \''+content.replace('\'','\'\'')+'\', (SELECT language_id FROM tb_languages WHERE language_codeset=REGEXP_REPLACE(COALESCE(\''+language+'\', \'0\'), \'[^0-9]*\' ,\'0\')::integer OR language_code=\''+language+'\' LIMIT 1), true ) RETURNING email_id';
+    var res = await database.query(query);
     if (res.rows[0] === undefined) return false;
     if (to.email !== undefined) {
       query = 'INSERT INTO tb_email_to ( email_to_email_id, email_to_name, email_to_email ) VALUES '+
@@ -41,7 +41,7 @@ async function schedule_email (to, subject, content, html, language, signature) 
       query = 'INSERT INTO tb_email_to ( email_to_email_id, email_to_email ) VALUES '+
               '( '+res.rows[0].email_id+', \''+to+'\' )';
     }
-    await database.pg_query(query);
+    await database.query(query);
   } catch (e) {
     console.log(e);
     return false;
@@ -58,7 +58,7 @@ async function send_email( row ) {
     from: row.email_from,
     replyTo: row.email_reply_to,
     to: row.email_to.join(', '),
-    subject: 'rd-a.xyz - ' + row.email_subject,
+    subject: 'sho.ovh - ' + row.email_subject,
     textEncoding: 'base64'
   }
   if (row.email_html === true) {
