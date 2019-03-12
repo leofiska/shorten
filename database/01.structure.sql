@@ -1042,12 +1042,58 @@ CREATE OR REPLACE FUNCTION get_sentence_sequency(t_alias text[] ) RETURNS SETOF 
   BEGIN
     query = '';
     t_where = '';
+    FOR i IN 1 .. array_upper(t_alias, 1)
+    LOOP
+      IF t_where != '' THEN
+        t_where = t_where||' OR ';
+      END IF;
+      --RAISE NOTICE ': %', i;
+      --RAISE NOTICE ': %', t_alias[i];
+      t_where = t_where||'page_alias=UPPER('''||t_alias[i]||''')';
+    END LOOP;
+    query = 'WITH a AS (
+              SELECT  language_codeset,
+                      language_code,
+                      LOWER(page_alias) AS page_alias,
+                      json_object_agg(LOWER(sentence_alias),sentence_value->language_codeset::text) as content
+              FROM tb_languages, v_sentences_page
+              where language_wui = true AND page_alias ILIKE ANY($2)
+              GROUP BY language_codeset, language_code, page_alias
+            ), b AS (
+              SELECT  language_code,
+                      json_object_agg(page_alias,content) as sentences
+              FROM a
+              GROUP BY language_code
+            )
+            SELECT json_agg(json_build_object(''alias'',language_code,''content'',sentences)) as item
+            FROM b';
+    RAISE NOTICE 'Query: %', query;
+    FOR rec IN EXECUTE query USING n, t_alias
+    LOOP
+      RETURN QUERY SELECT rec.item::json;
+    END LOOP;
+  END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM get_sentence_sequency(ARRAY[ 'bottom', 'MY_ACCOUNT' ]::text[]) as ( item json);
+
+DROP FUNCTION IF EXISTS get_sentence_sequency_by_page(t_alias text[] );
+CREATE OR REPLACE FUNCTION get_sentence_sequency_by_page(t_alias text[] ) RETURNS SETOF RECORD AS $$
+  DECLARE
+    rec RECORD;
+    item TEXT;
+    t_where TEXT;
+    query TEXT;
+    n int;
+    
+  BEGIN
+    query = '';
+    t_where = '';
     FOR rec IN (SELECT language_codeset, language_code FROM tb_languages WHERE language_wui=true)
     LOOP
       IF query != '' THEN 
         query = query||',';
       END IF;
-      --query = query||''''||rec.language_codeset||''',json_object_agg(LOWER(sentence_alias), sentence_value->'''||rec.language_codeset||''')';
       query = query||'json_build_object(''alias'','''||rec.language_code||''',''content'',json_object_agg(LOWER(sentence_alias), sentence_value->'''||rec.language_codeset||'''))';
     END LOOP;
     FOR i IN 1 .. array_upper(t_alias, 1)

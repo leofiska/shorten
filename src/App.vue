@@ -3,15 +3,15 @@
     <v-api ref='api' @fillSequency="fillSequency" :user="user" @setuser="setuser" :apiUrl="apiUrl" :id="id" @setid="id = $event" :token="token" @setready="ready = $event" @settoken="token = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :language="language" :language_code="language_code" />
     <div v-if="this.ready === true && this.sequency !== null">
       <Navigator :token="token" @settoken="token = $event" :user="user" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" @fetch="fetch" @sendonly="sendonly" :language_code="language_code" />
-      <Login v-if="ltoken === null" :language="language" :language_code="language_code" :online="online" @fetch="fetch" @sendonly="sendonly" @setloading="loading = $event" @setltoken="ltoken = $event" />
+      <Login v-if="this.sequency !== null && ltoken === null" :language="language" :language_code="language_code" :online="online" @fetch="fetch" @sendonly="sendonly" @setloading="loading = $event" @setltoken="ltoken = $event" />
       <Loading v-if="this.loading" :loading="this.loading" :language="language" />
-      <div id="app" v-if="(this.$route.meta.alwaysVisible || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions === undefined) || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions !== undefined && this.$route.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!this.$route.meta.requireAuth && ((user === null && this.$route.meta.guestOnly) || !this.$route.meta.guestOnly)))">
+      <div id="app" v-if="this.sequency !== null && (this.$route.meta.alwaysVisible || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions === undefined) || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions !== undefined && this.$route.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!this.$route.meta.requireAuth && ((user === null && this.$route.meta.guestOnly) || !this.$route.meta.guestOnly)))">
         <router-view @fetch="fetch" @sendonly="sendonly" @subscribe="subscribe" @unsubscribe="unsubscribe" :user="user"  :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setltoken="ltoken = $event" @setloading="loading = $event"  :language="language" :language_code="language_code" />
       </div>
       <div id="app" v-else>
         {{this.s.notallowed}}
       </div>
-      <Footer :sequency="sequency" :language="language" :language_code="language_code" @setlanguage="setlanguage" :title="title" />
+      <Footer v-if="this.sentences !== null" :sentences="sentences" :language="language" :language_code="language_code" @setlanguage="setlanguage" :title="title" />
     </div>
     <div v-else style='width: 100vw; height: 100vh; margin: 0; padding: 0; display: table;'>
       <div style='display: table-row;'>
@@ -54,7 +54,7 @@ export default {
           src: 'favicons/favicon-32x32.png'
         }
       },
-      sentences: [
+      local_sentences: [
         {
           alias: 'en-us',
           content:
@@ -74,6 +74,7 @@ export default {
       ],
       s: {
       },
+      sentences: null,
       sequency: null
     }
   },
@@ -83,13 +84,6 @@ export default {
     if (this.user === null) {
       this.setlanguage(navigator.language.toLowerCase())
     }
-    for (var i = 0; this.sentences[i] !== undefined; i++) {
-      if (this.sentences[i].alias === this.language) {
-        this.s = this.sentences[i].content
-        return
-      }
-    }
-    this.s = this.sentences[0].content
   },
   mounted () {
   },
@@ -101,11 +95,13 @@ export default {
   },
   methods: {
     fillSequency (obj) {
-      if (this.sequency === null) this.sequency = {}
-      for (var i in obj.objects) {
-        this.sequency[i] = obj.objects[i]
+      this.sequency = obj.objects
+      for (var i = 0; this.sequency[i] !== undefined; i++) {
+        if (this.sequency[i].alias === this.language) {
+          this.sentences = this.sequency[i].content
+          break
+        }
       }
-      console.log(this.sequency)
     },
     setlanguage (nl) {
       this.language = nl
@@ -193,9 +189,10 @@ export default {
       }
     },
     language: function (newVal, oldVal) {
-      for (var i = 0; this.sentences[i] !== undefined; i++) {
-        if (this.sentences[i].alias === newVal) {
-          this.s = this.sentences[i].content
+      if (this.sequency === null) return;
+      for (var i = 0; this.sequency[i] !== undefined; i++) {
+        if (this.sequency[i].alias === newVal) {
+          this.sentences = this.sequency[i].content
           break
         }
       }

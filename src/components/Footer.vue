@@ -1,14 +1,14 @@
 <template>
-  <footer v-if="this.sequency !== null && this.sequency.bottom !== undefined">
+  <footer v-if="this.sentences !== null && this.sentences.bottom !== undefined">
       <div class="container text-center text-md-left">
         <div class="row">
           <div class="col-md-4 mx-auto text-center">
             <h5 class="font-weight-bold mt-3 mb-4">{{title[this.language_code]}}</h5>
-            <p>{{s.simplify}}</p>
+            <p>{{sentences.bottom.simplify}}</p>
           </div>
           <hr class="d-md-none">
           <div class="col-md-2 mx-auto">
-            <h5 class="font-weight-bold mt-3 mb-4">{{s.links}}</h5>
+            <h5 class="font-weight-bold mt-3 mb-4">{{sentences.bottom.links}}</h5>
             <ul class="list-unstyled">
               <li>
                 <b-link href="https://soraiaschneider.com.br" target="_blank">soraiaschneider.com.br</b-link>
@@ -20,14 +20,14 @@
           </div>
           <hr class='d-md-none'>
           <div class='col-md-3 mx-auto'>
-            <h5 class="font-weight-bold mt-3 mb-4">{{s.language}}</h5>
+            <h5 class="font-weight-bold mt-3 mb-4">{{sentences.bottom.language}}</h5>
             <div class='d-inline-block'>
               <Language :language="language" @setlanguage="setlanguage" />
             </div>
           </div>
         </div>
       <hr>
-      <p class="text-center">{{s.follow_on_social}}</p>
+      <p class="text-center">{{sentences.bottom.follow_on_social}}</p>
       <p class="text-center">
         <b-link class='bw' style='color: #016FAC' href="https://linkedin.com/in/leofiska" target="_blank"><font-awesome-icon :icon="['fab', 'linkedin']" size="3x" /></b-link>
         <b-link class='bw' style='color: #3B589E' href="https://facebook.com/leofiska" target="_blank"><font-awesome-icon :icon="['fab', 'facebook']" size="3x" /></b-link>
@@ -50,26 +50,15 @@ export default {
   },
   data () {
     return {
-      s: {
-      }
     }
   },
   props: [
     'title',
     'language',
     'language_code',
-    'sequency'
+    'sentences'
   ],
-  created () {
-  },
   mounted () {
-    for (var i = 0; this.sequency.bottom[i] !== undefined; i++) {
-      if (this.sequency.bottom[i].alias === this.language) {
-        this.s = this.sequency.bottom[i].content
-        return
-      }
-    }
-    this.s = this.sequency.bottom[0].content
   },
   methods: {
     setlanguage: function (nl) {
@@ -78,18 +67,6 @@ export default {
     setsentences: function (obj) {
       console.log(obj)
     }
-  },
-  watch: {
-    language: function (newVal, oldVal) {
-      for (var i = 0; this.sequency.bottom[i] !== undefined; i++) {
-        if (this.sequency.bottom[i].alias === newVal) {
-          this.s = this.sequency.bottom[i].content
-          break
-        }
-      }
-    }
-  },
-  computed: {
   }
 }
 </script>
