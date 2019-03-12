@@ -7,7 +7,8 @@ export default {
     'ltoken',
     'online',
     'apiUrl',
-    'user'
+    'user',
+    'sequency'
   ],
   render () {
     return {
@@ -35,6 +36,7 @@ export default {
           return
         }
         this.socket.onopen = () => {
+          this.send({f: 'sentence', module: 'basic'})
           this.send({f: 'token', token: this.token, stoken: this.stoken}, true)
         }
         this.socket.onmessage = (e) => {
@@ -105,6 +107,9 @@ export default {
               }
             }
             this.$emit('setOnline', true)
+            break
+          case 'sequency':
+            this.$emit('fillSequency', obj)
             break
           case 'user':
             this.$emit('setuser', obj.el)
@@ -189,16 +194,6 @@ export default {
         this.send({f: request.method, options: request.options, tid: request.sync.tid})
       } else {
         this.send({f: request.method, options: request.options})
-      }
-    },
-    getsentences: function (request) {
-      this.$emit('setloading', true)
-      if (request.sync !== undefined) {
-        this.bindings.lock = true
-        request.sync.tid = this.tid++
-        this.bindings.objects.push(request)
-        this.bindings.lock = false
-        this.send({f: request.method, options: request.options, tid: request.sync.tid})
       }
     },
     setlanguage: function (language, languageCode) {

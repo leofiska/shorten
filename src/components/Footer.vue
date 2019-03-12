@@ -1,5 +1,5 @@
 <template>
-  <footer>
+  <footer v-if="this.sequency !== null && this.sequency.bottom !== undefined">
       <div class="container text-center text-md-left">
         <div class="row">
           <div class="col-md-4 mx-auto text-center">
@@ -50,28 +50,6 @@ export default {
   },
   data () {
     return {
-      sentences: [
-        {
-          alias: 'en-us',
-          content:
-          {
-            links: 'Links',
-            language: 'Language',
-            simplify: 'simplify your links!',
-            follow_on_social: 'follow on social networks'
-          }
-        },
-        {
-          alias: 'pt-br',
-          content:
-          {
-            links: 'Links',
-            language: 'Idioma',
-            simplify: 'simplifique seus links!',
-            follow_on_social: 'siga nas redes sociais'
-          }
-        }
-      ],
       s: {
       }
     }
@@ -79,29 +57,33 @@ export default {
   props: [
     'title',
     'language',
-    'language_code'
+    'language_code',
+    'sequency'
   ],
   created () {
-    for (var i = 0; this.sentences[i] !== undefined; i++) {
-      if (this.sentences[i].alias === this.language) {
-        this.s = this.sentences[i].content
+  },
+  mounted () {
+    for (var i = 0; this.sequency.bottom[i] !== undefined; i++) {
+      if (this.sequency.bottom[i].alias === this.language) {
+        this.s = this.sequency.bottom[i].content
         return
       }
     }
-    this.s = this.sentences[0].content
-  },
-  mounted () {
+    this.s = this.sequency.bottom[0].content
   },
   methods: {
     setlanguage: function (nl) {
       this.$emit('setlanguage', nl)
+    },
+    setsentences: function (obj) {
+      console.log(obj)
     }
   },
   watch: {
     language: function (newVal, oldVal) {
-      for (var i = 0; this.sentences[i] !== undefined; i++) {
-        if (this.sentences[i].alias === newVal) {
-          this.s = this.sentences[i].content
+      for (var i = 0; this.sequency.bottom[i] !== undefined; i++) {
+        if (this.sequency.bottom[i].alias === newVal) {
+          this.s = this.sequency.bottom[i].content
           break
         }
       }
