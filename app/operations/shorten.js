@@ -59,7 +59,6 @@ async function verify_and_create(ws, obj) {
     query += ' AND short_global_id='+ws.token.token_id;
   }
   query += ' LIMIT 1';
-  console.log(query);
   var res = await database.query(query);
   if (res === null) {
     return;
@@ -135,16 +134,11 @@ async function create(ws, obj) {
 
 function notify(obj) {
   if (obj === undefined || obj === null) return;
-  console.log('-------');
-  console.log(JSON.stringify(obj));
-  console.log('-------');
   var t = subscribers[obj.id.toString()];
   if (t === undefined || t === null) return;
   for (var i = t.length - 1; i >= 0; i--) {
     if (t[i].ws !== undefined &&
       t[i].ws !== null) {
-      console.log('notifying');
-      console.log(JSON.stringify(obj));
       t[i].ws.send(JSON.stringify({
         f: 'info',
         tid: t[i].obj.tid,

@@ -8,7 +8,7 @@ module.exports = {
 
 async function get_sentence (alias, language) {
   try {
-    var query = 'SELECT * FROM get_sentence_sequency( \''+alias+'\', \''+language+'\' ) as (sentence_alias text, sentence_value text)';
+    var query = 'SELECT * FROM get_sentence_sequency( \''+language+'\', \''+alias+'\' ) as (sentence_alias text, sentence_value text)';
     var res = await database.query(query);
     if (res.rowCount !== 1) {
       return null;
@@ -20,19 +20,41 @@ async function get_sentence (alias, language) {
 }
 
 async function get_sentence_sequency (alias, language) {
-  try {
-    var query = 'SELECT * FROM get_sentence_sequency( \''+alias+'\', \''+language+'\' ) as (sentence_alias text, sentence_value text)';
-    var res = await database.query(query);
-    if (res.rowCount < 1) {
+  var query = '';
+  var res = null;
+  var ret = null;
+
+  if (language !== undefined) {
+    try {
+      query = 'SELECT * FROM get_sentence_sequency( \''+language+'\', \''+alias+'\' ) as (sentence_alias text, sentence_value text)';
+      res = await database.query(query);
+      if (res.rowCount < 1) {
+        return null;
+      }
+      ret = {};
+      for (var i =0; res.rows[i] !== undefined; i++) {
+        ret[res.rows[i].sentence_alias.toLowerCase()] = res.rows[i].sentence_value;
+      }
+      return ret;
+    } catch (e) {
       return null;
     }
-    var ret = {};
-    for (var i =0; res.rows[i] !== undefined; i++) {
-      ret[res.rows[i].sentence_alias.toLowerCase()] = res.rows[i].sentence_value;
+  } else {
+    if (typeof alias === 'object') {
+      query = 'SELECT * FROM get_sentence_sequency(ARRAY[ ';
+      for (var i = 0; alias[i] !== undefined; i++) {
+        if (i !== 0) query += ', ';
+        query += '\''+alias[i]+'\'';
+      }
+      query += ' ]::text[]) as ( item json)';
+      res = await database.query(query);
+      if (res.rowCount < 1) {
+        return null;
+      }
+      return res.rows[0].item;
+    } else {
+      console.log(typeof alias);
     }
-    return ret;
-  } catch (e) {
-    return null;
   }
 }
 
