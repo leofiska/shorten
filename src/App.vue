@@ -126,6 +126,12 @@ export default {
         this.$refs.api.fetch(request)
       }
     },
+    getsentences (request) {
+      if (this.$refs.api !== undefined) {
+        this.loading = true
+        this.$refs.api.getsentences(request)
+      }
+    },
     sendonly (request) {
       if (this.$refs.api !== undefined) {
         this.$refs.api.sendonly(request)

@@ -183,11 +183,22 @@ export default {
       this.$emit('setloading', true)
       if (request.sync !== undefined) {
         if (request.sync.tid < 0) {
+          request.sync.tid = this.tid++
           request.sync.tid = this.bindings.objects.push(request)
         }
         this.send({f: request.method, options: request.options, tid: request.sync.tid})
       } else {
         this.send({f: request.method, options: request.options})
+      }
+    },
+    getsentences: function (request) {
+      this.$emit('setloading', true)
+      if (request.sync !== undefined) {
+        this.bindings.lock = true
+        request.sync.tid = this.tid++
+        this.bindings.objects.push(request)
+        this.bindings.lock = false
+        this.send({f: request.method, options: request.options, tid: request.sync.tid})
       }
     },
     setlanguage: function (language, languageCode) {
