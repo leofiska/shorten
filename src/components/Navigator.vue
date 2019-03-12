@@ -5,16 +5,16 @@
     <b-navbar-brand v-else to="/">{{this.menu.alt}}</b-navbar-brand>
     <b-collapse is-nav id="nav_collapse">
       <b-navbar-nav>
-        <b-nav-item :to="item.path" v-for="item in routes" :key="item.path" :disabled="!online" v-if="(item.meta.isDisplayed === true && (item.meta.alwaysVisible || (item.meta.requireAuth && user !== null && item.meta.permissions === undefined) || (item.meta.requireAuth && user !== null && item.meta.permissions !== undefined && item.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!item.meta.requireAuth && ((user === null && item.meta.guestOnly) || !item.meta.guestOnly))))">{{s.menu[item.array]}}</b-nav-item>
+        <b-nav-item :to="item.path" v-for="item in routes" :key="item.path" :disabled="!online" v-if="(item.meta.isDisplayed === true && (item.meta.alwaysVisible || (item.meta.requireAuth && user !== null && item.meta.permissions === undefined) || (item.meta.requireAuth && user !== null && item.meta.permissions !== undefined && item.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!item.meta.requireAuth && ((user === null && item.meta.guestOnly) || !item.meta.guestOnly))))">{{sentences.navigator[item.alias]}}</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto" v-if="ltoken">
-        <b-nav-item-dropdown right :disabled="!online" :text="s.account">
-          <b-dropdown-item to="/profile" v-if="ltoken" :disabled="!online">{{s.profile}}</b-dropdown-item>
-          <b-dropdown-item @click.prevent="logout" v-if="ltoken" :disabled="!online">{{s.signout}}</b-dropdown-item>
+        <b-nav-item-dropdown right :disabled="!online" :text="sentences.navigator.account">
+          <b-dropdown-item to="/profile" v-if="ltoken" :disabled="!online">{{sentences.navigator.profile}}</b-dropdown-item>
+          <b-dropdown-item @click.prevent="logout" v-if="ltoken" :disabled="!online">{{sentences.navigator.signout}}</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto" v-else>
-         <b-nav-item v-b-modal.login :disabled="!online" @click.prevent="login_focus_timer">{{s.signin}}</b-nav-item>
+         <b-nav-item v-b-modal.login :disabled="!online" @click.prevent="login_focus_timer">{{sentences.navigator.signin}}</b-nav-item>
       </b-navbar-nav>
     </b-collapse>
   </b-navbar>
@@ -26,7 +26,7 @@ export default {
   name: 'navigator',
   data () {
     return {
-      sentences: [
+      local_sentences: [
         {
           alias: 'en-us',
           content:
@@ -74,16 +74,10 @@ export default {
     'menu',
     'language',
     'baseUrl',
-    'user'
+    'user',
+    'sentences'
   ],
   created: function () {
-    for (var i = 0; this.sentences[i] !== undefined; i++) {
-      if (this.sentences[i].alias === this.language) {
-        this.s = this.sentences[i].content
-        return
-      }
-    }
-    this.s = this.sentences[0].content
   },
   methods: {
     login_focus_timer () {
@@ -125,14 +119,6 @@ export default {
     }
   },
   watch: {
-    language: function (newVal, oldVal) {
-      for (var i = 0; this.sentences[i] !== undefined; i++) {
-        if (this.sentences[i].alias === newVal) {
-          this.s = this.sentences[i].content
-          break
-        }
-      }
-    }
   },
   computed: {
     routes () {

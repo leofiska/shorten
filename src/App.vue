@@ -2,21 +2,21 @@
   <div>
     <v-api ref='api' @fillSequency="fillSequency" :user="user" @setuser="setuser" :apiUrl="apiUrl" :id="id" @setid="id = $event" :token="token" @setready="ready = $event" @settoken="token = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :language="language" :language_code="language_code" />
     <div v-if="this.ready === true && this.sequency !== null">
-      <Navigator :token="token" @settoken="token = $event" :user="user" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" @fetch="fetch" @sendonly="sendonly" :language_code="language_code" />
+      <Navigator v-if="this.sentences !== null" :sentences="sentences" :token="token" @settoken="token = $event" :user="user" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" @fetch="fetch" @sendonly="sendonly" :language_code="language_code" />
       <Login v-if="this.sequency !== null && ltoken === null" :language="language" :language_code="language_code" :online="online" @fetch="fetch" @sendonly="sendonly" @setloading="loading = $event" @setltoken="ltoken = $event" />
       <Loading v-if="this.loading" :loading="this.loading" :language="language" />
       <div id="app" v-if="this.sequency !== null && (this.$route.meta.alwaysVisible || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions === undefined) || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions !== undefined && this.$route.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!this.$route.meta.requireAuth && ((user === null && this.$route.meta.guestOnly) || !this.$route.meta.guestOnly)))">
         <router-view @fetch="fetch" @sendonly="sendonly" @subscribe="subscribe" @unsubscribe="unsubscribe" :user="user"  :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setltoken="ltoken = $event" @setloading="loading = $event"  :language="language" :language_code="language_code" />
       </div>
       <div id="app" v-else>
-        {{this.s.notallowed}}
+        {{this.local_sentences[0].content.notallowed}}
       </div>
       <Footer v-if="this.sentences !== null" :sentences="sentences" :language="language" :language_code="language_code" @setlanguage="setlanguage" :title="title" />
     </div>
     <div v-else style='width: 100vw; height: 100vh; margin: 0; padding: 0; display: table;'>
       <div style='display: table-row;'>
         <div style='display: table-cell; vertical-align: middle; text-align: center;'>
-          {{this.s.loading}}
+          {{this.local_sentences[0].content.loading}}
         </div>
       </div>
     </div>

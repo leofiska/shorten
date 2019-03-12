@@ -252,6 +252,14 @@ SELECT insert_sentences_page( 'INCORRECT_CURRENT_PASSWORD', 'CHANGE_PASSWORD', '
 SELECT insert_sentences_page( 'NEW_PASSWORD_MUST_BE_DIFFERENT', 'CHANGE_PASSWORD', '"1033"=>"New password must not be the same as the current password", "1046"=>"A nova senha deve ser diferente da senha atual"'::hstore );
 SELECT insert_sentences_page( 'RELOAD', 'USERS', '"1033"=>"Reload", "1046"=>"Recarregar"'::hstore );
 
+--# MENU
+SELECT insert_sentences_page( 'HOME', 'NAVIGATOR', '"1033"=>"Home", "1046"=>"Home"'::hstore );
+SELECT insert_sentences_page( 'ABOUT', 'NAVIGATOR', '"1033"=>"About", "1046"=>"Sobre"'::hstore );
+SELECT insert_sentences_page( 'PROFILE', 'NAVIGATOR', '"1033"=>"Profile", "1046"=>"Perfil"'::hstore );
+SELECT insert_sentences_page( 'ACCOUNT', 'NAVIGATOR', '"1033"=>"Account", "1046"=>"Conta"'::hstore );
+SELECT insert_sentences_page( 'SIGNIN', 'NAVIGATOR', '"1033"=>"Sign-In", "1046"=>"Entrar"'::hstore );
+SELECT insert_sentences_page( 'SIGNOUT', 'NAVIGATOR', '"1033"=>"Sign-Out", "1046"=>"Sair"'::hstore );
+
 --# TASKS
 --#SELECT insert_task_status ( 'QUEUED', '"1033"=>"Queued", "1046"=>"Enfileirado"'::hstore );
 SELECT insert_task_status ( 'IDENTIFYING', '"1033"=>"Identifying", "1046"=>"Identificando"'::hstore );

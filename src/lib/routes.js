@@ -9,7 +9,7 @@ export default {
     {
       path: '/home',
       name: 'home',
-      array: 1,
+      alias: 'home',
       component: Home,
       meta:
       {
@@ -22,7 +22,7 @@ export default {
     {
       path: '/about',
       name: 'about',
-      array: 0,
+      alias: 'about',
       component: About,
       meta:
       {
@@ -35,7 +35,6 @@ export default {
     {
       path: '/profile',
       name: 'profile',
-      array: 2,
       component: Profile,
       meta:
       {
@@ -48,7 +47,6 @@ export default {
     {
       path: '/passcode/:time/:id/:pass',
       name: 'passcode',
-      array: 2,
       component: Passcode,
       meta:
       {
