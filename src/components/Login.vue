@@ -190,11 +190,11 @@ export default {
             sessionStorage.removeItem('ltoken')
             if (obj.content.keep === true) {
               localStorage.setItem('ltoken', obj.content.ltoken)
+              this.$emit('sendonly', { method: 'token', options: { f: 'reauth' } })
             } else {
               sessionStorage.setItem('ltoken', obj.content.ltoken)
             }
             this.$emit('setltoken', obj.content.ltoken)
-            this.hide()
           }
           this.dismissCountDown = this.dismissSecs
           break

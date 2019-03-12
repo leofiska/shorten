@@ -36,7 +36,6 @@ export default {
         }
         this.socket.onopen = () => {
           this.send({f: 'token', token: this.token, stoken: this.stoken}, true)
-          this.send({f: 'auth', ltoken: this.ltoken}, true)
         }
         this.socket.onmessage = (e) => {
           try {
@@ -105,9 +104,13 @@ export default {
                 this.resubscribe(this.bindings.objects[i])
               }
             }
+            this.$emit('setOnline', true)
             break
           case 'user':
             this.$emit('setuser', obj.el)
+            break
+          case 'reauth':
+            this.$emit('setltoken', sessionStorage.getItem('ltoken') || localStorage.getItem('ltoken'))
             break
           case 'token':
             if (obj.error !== false) {
@@ -119,6 +122,7 @@ export default {
               window.scrollTo(0, 0)
               return
             }
+            this.send({f: 'auth', ltoken: this.ltoken}, true)
             localStorage.setItem('token', obj.content.token)
             sessionStorage.setItem('stoken', obj.content.stoken)
             this.$emit('settoken', obj.content.token)
@@ -128,8 +132,13 @@ export default {
             break
           case 'logout':
             if (obj.error === false) {
-              sessionStorage.removeItem('ltoken')
-              localStorage.removeItem('ltoken')
+              if (sessionStorage.getItem('ltoken') !== undefined && sessionStorage.getItem('ltoken') !== null) {
+                sessionStorage.removeItem('ltoken')
+              }
+              if (localStorage.getItem('ltoken') !== undefined && localStorage.getItem('ltoken') !== null) {
+                localStorage.removeItem('ltoken')
+                this.send({ f: 'token', options: { f: 'reauth' } })
+              }
               this.$emit('setltoken', null)
               this.$emit('setuser', null)
               this.$router.push('/')
@@ -160,15 +169,24 @@ export default {
       if (id === undefined || pass === undefined || id === '' || pass === '') return false
       this.send({ f: 'login', id: id, pass: pass })
     },
-    fetch: function (request) {
+    sendonly: function (request) {
       if (request.sync !== undefined) {
         if (request.sync.tid < 0) {
           request.sync.tid = this.bindings.objects.push(request)
         }
-        this.$emit('setloading', true)
         this.send({f: request.method, options: request.options, tid: request.sync.tid})
       } else {
-        this.$emit('setloading', true)
+        this.send({f: request.method, options: request.options})
+      }
+    },
+    fetch: function (request) {
+      this.$emit('setloading', true)
+      if (request.sync !== undefined) {
+        if (request.sync.tid < 0) {
+          request.sync.tid = this.bindings.objects.push(request)
+        }
+        this.send({f: request.method, options: request.options, tid: request.sync.tid})
+      } else {
         this.send({f: request.method, options: request.options})
       }
     },
@@ -222,7 +240,9 @@ export default {
   },
   watch: {
     ltoken: function (newVal, oldVal) {
-      this.send({f: 'auth', ltoken: this.ltoken}, true)
+      if (newVal !== oldVal) {
+        this.send({f: 'auth', ltoken: this.ltoken}, true)
+      }
       if (newVal === null) {
         this.$router.push('/')
       }

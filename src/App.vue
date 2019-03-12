@@ -2,16 +2,18 @@
   <div>
     <v-api ref='api' :user="user" @setuser="setuser" :apiUrl="apiUrl" :id="id" @setid="id = $event" :token="token" @setready="ready = $event" @settoken="token = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :language="language" :language_code="language_code" />
     <div v-if="this.ready === true">
-      <Navigator :token="token" @settoken="token = $event" :user="user" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" @fetch="fetch" :language_code="language_code" />
-      <Login v-if="ltoken === null" :language="language" :language_code="language_code" :online="online" @fetch="fetch" @setloading="loading = $event" @setltoken="ltoken = $event" />
+      <Navigator :token="token" @settoken="token = $event" :user="user" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" @fetch="fetch" @sendonly="sendonly" :language_code="language_code" />
+      <Login v-if="ltoken === null" :language="language" :language_code="language_code" :online="online" @fetch="fetch" @sendonly="sendonly" @setloading="loading = $event" @setltoken="ltoken = $event" />
       <Loading v-if="this.loading" :loading="this.loading" :language="language" />
       <div id="app" v-if="(this.$route.meta.alwaysVisible || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions === undefined) || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions !== undefined && this.$route.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!this.$route.meta.requireAuth && ((user === null && this.$route.meta.guestOnly) || !this.$route.meta.guestOnly)))">
-        <router-view @fetch="fetch" @subscribe="subscribe" @unsubscribe="unsubscribe" :user="user"  :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setltoken="ltoken = $event" @setloading="loading = $event"  :language="language" :language_code="language_code" />
+        <router-view @fetch="fetch" @sendonly="sendonly" @subscribe="subscribe" @unsubscribe="unsubscribe" :user="user"  :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setltoken="ltoken = $event" @setloading="loading = $event"  :language="language" :language_code="language_code" />
       </div>
       <div id="app" v-else>
         {{this.s.notallowed}}
       </div>
+      footer1
       <Footer :language="language" :language_code="language_code" @setlanguage="setlanguage" :title="title" />
+      footer2
     </div>
     <div v-else style='width: 100vw; height: 100vh; margin: 0; padding: 0; display: table;'>
       <div style='display: table-row;'>
@@ -122,6 +124,11 @@ export default {
       if (this.$refs.api !== undefined) {
         this.loading = true
         this.$refs.api.fetch(request)
+      }
+    },
+    sendonly (request) {
+      if (this.$refs.api !== undefined) {
+        this.$refs.api.sendonly(request)
       }
     },
     subscribe (request) {

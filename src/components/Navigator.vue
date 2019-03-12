@@ -102,15 +102,18 @@ export default {
       }
     },
     logout () {
-      this.$emit('setloading', true)
-      this.$emit('fetch', { method: 'logout', storno: this.storno, context: this, sync: this.items, options: { f: 'logout' } })
+      this.$emit('sendonly', { method: 'logout', storno: this.storno, context: this, sync: this.items, options: { f: 'logout' } })
       if (this.$route.name === 'profile') {
         this.$router.push('/home')
       }
     },
     storno (obj) {
+      this.$emit('setloading', false)
       if (obj.error === false) {
         this.$emit('setltoken', null)
+        if (localStorage.getItem('ltoken') !== undefined && localStorage.getItem('ltoken') !== null) {
+          this.$emit('sendonly', { method: 'token', options: { f: 'reauth' } })
+        }
         localStorage.removeItem('ltoken')
         sessionStorage.removeItem('ltoken')
       }
