@@ -86,7 +86,6 @@ async function exec (req, ws, obj) {
           params.time = base.base64decode(obj.options.time);
           params.keep = obj.options.keep;
           query = 'SELECT * FROM tb_users WHERE user_attributes->\'usercode\'=\''+params.id+'\' AND user_attributes->\'passtime\'=\''+params.time+'\' AND user_attributes->\'passcode\'=\''+params.passcode+'\' AND (REGEXP_REPLACE(COALESCE(user_attributes->\'passtime\', \'0\'), \'[^0-9]*\' ,\'0\')::integer + 300) > '+Math.floor(Date.now() / 1000)+' LIMIT 1';
-          console.log(query);
           var step1 = await database.query(query);
           if (step1.rowCount !== 1) {
             ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 404, tid: obj.tid }));
@@ -129,7 +128,6 @@ async function exec (req, ws, obj) {
           }
           auth();
         } catch (e) {
-          console.log(e);
           ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 404, tid: obj.tid }));
           return;
         }
@@ -178,7 +176,7 @@ async function exec (req, ws, obj) {
                 }
               }
             }));
-          }
+          };
           auth();
         } catch (e) {
           ws.send(JSON.stringify({ f: 'login_password', auth: false, error: 404, tid: obj.tid }));

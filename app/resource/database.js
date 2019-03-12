@@ -12,18 +12,21 @@ async function query (q) {
   // console.log(q)
   let res
   try {
+    await client.query('ROLLBACK')
     await client.query('BEGIN')
     res = await client.query(q)
     await client.query('COMMIT')
     await client.query('ROLLBACK')
     res = { rowCount: res.rowCount, rows: res.rows };
   } catch (err) {
-    // console.log(err);
+    console.log(q);
+    console.log(err);
     res = null;
   }
   try {
     client.release()
   } catch (err) {
+    console.log(err);
   }
   return res;
 }

@@ -92,6 +92,9 @@ var exec = async function(req, ws, obj) {
 function create_obj (ws, row) {
   var network = "internal";
   var ans = {};
+  if (ws.user === null) {
+    ws.user = { auth: {} };
+  }
   ws.user.user_id = row.user_id;
   ans.id = row.user_id;
   ws.user.username = row.user_nickname;
