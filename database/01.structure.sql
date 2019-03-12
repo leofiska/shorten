@@ -984,8 +984,8 @@ CREATE OR REPLACE FUNCTION get_sentence(t_alias char(5), t_language text ) RETUR
   END;
 $$ LANGUAGE plpgsql;
 
-DROP FUNCTION IF EXISTS get_sentence_sequency(t_alias char(5), t_language text );
-CREATE OR REPLACE FUNCTION get_sentence_sequency(t_alias char(5), t_language text ) RETURNS SETOF RECORD AS $$
+DROP FUNCTION IF EXISTS get_sentence_sequency(t_language char(5), t_alias text );
+CREATE OR REPLACE FUNCTION get_sentence_sequency(t_language char(5), t_alias text ) RETURNS SETOF RECORD AS $$
   DECLARE
     l_id tb_languages.language_codeset%TYPE;
     rec RECORD;
@@ -1003,3 +1003,68 @@ CREATE OR REPLACE FUNCTION get_sentence_sequency(t_alias char(5), t_language tex
   END;
 $$ LANGUAGE plpgsql;
 
+DROP FUNCTION IF EXISTS get_sentence_sequency(t_alias text );
+CREATE OR REPLACE FUNCTION get_sentence_sequency(t_alias text ) RETURNS SETOF RECORD AS $$
+  DECLARE
+    rec RECORD;
+    query TEXT;
+    n int;
+    
+  BEGIN
+    query = '';
+    FOR rec IN (SELECT language_codeset, language_code FROM tb_languages WHERE language_wui=true)
+    LOOP
+      IF query != '' THEN 
+        query = query||',';
+      END IF;
+      query = query||''''||rec.language_codeset||''',array_agg(json_build_object(LOWER(sentence_alias), sentence_value->'''||rec.language_codeset||'''))';
+    END LOOP;
+    query = 'SELECT json_build_object('||query||') AS sentences, page_alias FROM v_sentences_page WHERE page_alias=UPPER('''||t_alias||''') GROUP BY page_alias';
+    --RAISE NOTICE 'Query: %', query;
+    --EXECUTE query INTO recs;
+    --RAISE NOTICE 'Result: %', recs;
+    FOR rec IN EXECUTE query USING n
+    LOOP
+      RETURN QUERY SELECT rec.page_alias::text as page_alias, rec.sentences::json;
+    END LOOP;
+  END;
+$$ LANGUAGE plpgsql;
+
+DROP FUNCTION IF EXISTS get_sentence_sequency(t_alias text[] );
+CREATE OR REPLACE FUNCTION get_sentence_sequency(t_alias text[] ) RETURNS SETOF RECORD AS $$
+  DECLARE
+    rec RECORD;
+    item TEXT;
+    t_where TEXT;
+    query TEXT;
+    n int;
+    
+  BEGIN
+    query = '';
+    t_where = '';
+    FOR rec IN (SELECT language_codeset, language_code FROM tb_languages WHERE language_wui=true)
+    LOOP
+      IF query != '' THEN 
+        query = query||',';
+      END IF;
+      query = query||''''||rec.language_codeset||''',array_agg(json_build_object(LOWER(sentence_alias), sentence_value->'''||rec.language_codeset||'''))';
+    END LOOP;
+    FOR i IN 1 .. array_upper(t_alias, 1)
+    LOOP
+      IF t_where != '' THEN
+        t_where = t_where||' OR ';
+      END IF;
+      --RAISE NOTICE ': %', i;
+      --RAISE NOTICE ': %', t_alias[i];
+      t_where = t_where||'page_alias=UPPER('''||t_alias[i]||''')';
+    END LOOP;
+    query = 'SELECT json_build_object('||query||') AS sentences, page_alias FROM v_sentences_page WHERE '||t_where||' GROUP BY page_alias';
+    --RAISE NOTICE 'Query: %', query;
+    --EXECUTE query INTO recs;
+    --RAISE NOTICE 'Result: %', recs;
+    FOR rec IN EXECUTE query USING n
+    LOOP
+      RETURN QUERY SELECT rec.page_alias::text as page_alias, rec.sentences::json;
+    END LOOP;
+  END;
+$$ LANGUAGE plpgsql;
