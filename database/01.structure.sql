@@ -1017,15 +1017,15 @@ CREATE OR REPLACE FUNCTION get_sentence_sequency(t_alias text ) RETURNS SETOF RE
       IF query != '' THEN 
         query = query||',';
       END IF;
-      query = query||''''||rec.language_codeset||''',array_agg(json_build_object(LOWER(sentence_alias), sentence_value->'''||rec.language_codeset||'''))';
+      query = query||'json_build_object(''alias'','''||rec.language_code||''',''content'',json_object_agg(LOWER(sentence_alias), sentence_value->'''||rec.language_codeset||'''))';
     END LOOP;
-    query = 'SELECT json_build_object('||query||') AS sentences, page_alias FROM v_sentences_page WHERE page_alias=UPPER('''||t_alias||''') GROUP BY page_alias';
+    query = 'WITH a AS (SELECT ARRAY['||query||'] AS sentences, page_alias FROM v_sentences_page WHERE page_alias=UPPER('''||t_alias||''') GROUP BY page_alias) SELECT json_object_agg(LOWER(page_alias),sentences) as item FROM a';
     --RAISE NOTICE 'Query: %', query;
     --EXECUTE query INTO recs;
     --RAISE NOTICE 'Result: %', recs;
     FOR rec IN EXECUTE query USING n
     LOOP
-      RETURN QUERY SELECT rec.page_alias::text as page_alias, rec.sentences::json;
+      RETURN QUERY SELECT rec.item::json;
     END LOOP;
   END;
 $$ LANGUAGE plpgsql;
@@ -1047,7 +1047,8 @@ CREATE OR REPLACE FUNCTION get_sentence_sequency(t_alias text[] ) RETURNS SETOF 
       IF query != '' THEN 
         query = query||',';
       END IF;
-      query = query||''''||rec.language_codeset||''',array_agg(json_build_object(LOWER(sentence_alias), sentence_value->'''||rec.language_codeset||'''))';
+      --query = query||''''||rec.language_codeset||''',json_object_agg(LOWER(sentence_alias), sentence_value->'''||rec.language_codeset||''')';
+      query = query||'json_build_object(''alias'','''||rec.language_code||''',''content'',json_object_agg(LOWER(sentence_alias), sentence_value->'''||rec.language_codeset||'''))';
     END LOOP;
     FOR i IN 1 .. array_upper(t_alias, 1)
     LOOP
@@ -1058,13 +1059,13 @@ CREATE OR REPLACE FUNCTION get_sentence_sequency(t_alias text[] ) RETURNS SETOF 
       --RAISE NOTICE ': %', t_alias[i];
       t_where = t_where||'page_alias=UPPER('''||t_alias[i]||''')';
     END LOOP;
-    query = 'SELECT json_build_object('||query||') AS sentences, page_alias FROM v_sentences_page WHERE '||t_where||' GROUP BY page_alias';
-    --RAISE NOTICE 'Query: %', query;
-    --EXECUTE query INTO recs;
-    --RAISE NOTICE 'Result: %', recs;
+    query = 'WITH a AS (SELECT ARRAY['||query||'] AS sentences, page_alias FROM v_sentences_page WHERE '||t_where||' GROUP BY page_alias) SELECT json_object_agg(LOWER(page_alias),sentences) as item FROM a';
+    RAISE NOTICE 'Query: %', query;
     FOR rec IN EXECUTE query USING n
     LOOP
-      RETURN QUERY SELECT rec.page_alias::text as page_alias, rec.sentences::json;
+      RETURN QUERY SELECT rec.item::json;
     END LOOP;
   END;
 $$ LANGUAGE plpgsql;
+
+SELECT * FROM get_sentence_sequency(ARRAY[ 'bottom', 'MY_ACCOUNT' ]::text[]) as ( item json);
