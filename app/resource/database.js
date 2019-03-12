@@ -9,25 +9,22 @@ module.exports = {
 
 async function query (q) {
   var client = await pool.connect()
-  // console.log(q)
   let res
   try {
-    await client.query('ROLLBACK')
     await client.query('BEGIN')
-    res = await client.query(q)
-    await client.query('COMMIT')
-    await client.query('ROLLBACK')
-    res = { rowCount: res.rowCount, rows: res.rows };
+    try {
+      res = await client.query(q)
+      res = { rowCount: res.rowCount, rows: res.rows, error: false };
+      await client.query('COMMIT')
+    } catch (err) {
+      await client.query('ROLLBACK')
+      res = { rowCount: -1, rows: [], error: true };
+    }
   } catch (err) {
-    console.log(q);
-    console.log(err);
-    res = null;
-  }
-  try {
+    res = { rowCount: -1, rows: [], error: true };
+  } finally {
     client.release()
-  } catch (err) {
-    console.log(err);
   }
-  return res;
+  return res
 }
 
