@@ -5,7 +5,7 @@
     <b-navbar-brand v-else to="/">{{this.menu.alt}}</b-navbar-brand>
     <b-collapse is-nav id="nav_collapse">
       <b-navbar-nav>
-        <b-nav-item :to="item.path" v-for="item in routes" :key="item.path" :disabled="!online" v-if="(item.meta.isDisplayed === true && ( item.meta.alwaysVisible || (item.meta.requireAuth && ltoken !== null) || (!item.meta.requireAuth && (ltoken === null && item.meta.guestOnly || !item.meta.guestOnly)) ))">{{s.menu[item.array]}}</b-nav-item>
+        <b-nav-item :to="item.path" v-for="item in routes" :key="item.path" :disabled="!online" v-if="(item.meta.isDisplayed === true && (item.meta.alwaysVisible || (item.meta.requireAuth && user !== null && item.meta.permissions === undefined) || (item.meta.requireAuth && user !== null && item.meta.permissions !== undefined && item.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!item.meta.requireAuth && ((user === null && item.meta.guestOnly) || !item.meta.guestOnly))))">{{s.menu[item.array]}}</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto" v-if="ltoken">
         <b-nav-item-dropdown right :disabled="!online" :text="s.account">
@@ -37,7 +37,9 @@ export default {
             signout: 'Sign-Out',
             menu: [
               'About',
-              'Home'
+              'Home',
+              'Network',
+              'Inventory'
             ]
           }
         },
@@ -51,7 +53,9 @@ export default {
             signout: 'Sair',
             menu: [
               'Sobre',
-              'Home'
+              'Home',
+              'Rede',
+              'Inventário'
             ]
           }
         }
@@ -69,7 +73,8 @@ export default {
     'online',
     'menu',
     'language',
-    'baseUrl'
+    'baseUrl',
+    'user'
   ],
   created: function () {
     for (var i = 0; this.sentences[i] !== undefined; i++) {
@@ -138,7 +143,10 @@ export default {
 </script>
 
 <style scoped>
-*:not(input) {
+div .navbar {
+  background-color: #3A4349 !important;
+}
+* {
   -webkit-user-select:none;
   -khtml-user-select:none;
   -moz-user-select:none;
