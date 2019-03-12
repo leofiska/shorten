@@ -11,9 +11,7 @@
       <div id="app" v-else>
         {{this.s.notallowed}}
       </div>
-      footer1
       <Footer :language="language" :language_code="language_code" @setlanguage="setlanguage" :title="title" />
-      footer2
     </div>
     <div v-else style='width: 100vw; height: 100vh; margin: 0; padding: 0; display: table;'>
       <div style='display: table-row;'>
