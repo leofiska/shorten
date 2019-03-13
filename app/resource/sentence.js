@@ -40,20 +40,25 @@ async function get_sentence_sequency (alias, language) {
       return null;
     }
   } else {
-    if (typeof alias === 'object') {
-      query = 'SELECT * FROM get_sentence_sequency(ARRAY[ ';
-      for (var i = 0; alias[i] !== undefined; i++) {
-        if (i !== 0) query += ', ';
-        query += '\''+alias[i]+'\'';
-      }
-      query += ' ]::text[]) as ( item json)';
-      res = await database.query(query);
-      if (res.rowCount < 1) {
-        return null;
-      }
-      return res.rows[0].item;
-    } else {
-      console.log(typeof alias);
+    switch(typeof alias) {
+      case 'object':
+        query = 'SELECT * FROM get_sentence_sequency(ARRAY[ ';
+        for (var i = 0; alias[i] !== undefined; i++) {
+          if (i !== 0) query += ', ';
+          query += '\''+alias[i]+'\'';
+        }
+        query += ' ]::text[]) as ( item json)';
+        res = await database.query(query);
+        if (res.rowCount < 1) {
+          return null;
+        }
+        return res.rows[0].item;
+      case 'string':
+        return await get_sentence_sequency( [alias] );
+        break;
+      default:
+        console.log(typeof alias);
+        break;
     }
   }
 }
