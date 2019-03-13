@@ -7,7 +7,8 @@ export default {
     'ltoken',
     'online',
     'apiUrl',
-    'user'
+    'user',
+    'sequency'
   ],
   render () {
     return {
@@ -35,7 +36,7 @@ export default {
           return
         }
         this.socket.onopen = () => {
-          this.send({f: 'sentence', module: 'basic'})
+          this.get_sentence('basic')
           this.send({f: 'token', token: this.token, stoken: this.stoken}, true)
         }
         this.socket.onmessage = (e) => {
@@ -174,10 +175,17 @@ export default {
       this.send({ f: 'login', id: id, pass: pass })
     },
     get_sentence: function (module) {
+      var md5 = null
       if (module === null || module === undefined) {
+        md5 = {}
+        if (this.sequency !== null) {
+          for (var i in this.sequency) {
+            md5[i] = this.sequency[i].md5
+          }
+        }
         module = 'basic'
       }
-      this.send({f: 'sentence', module: module})
+      this.send({f: 'sentence', module: module, md5: md5})
     },
     sendonly: function (request) {
       if (request.sync !== undefined) {
