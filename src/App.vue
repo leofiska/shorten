@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-api ref='api' :sequency="sequency" @fillSequency="fillSequency" :user="user" @setuser="setuser" :apiUrl="apiUrl" :id="id" @setid="id = $event" :token="token" @setready="ready = $event" @settoken="token = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :language="language" :language_code="language_code" />
+    <v-api ref='api' @fillSequency="fillSequency" :user="user" @setuser="setuser" :apiUrl="apiUrl" :id="id" @setid="id = $event" :token="token" @setready="ready = $event" @settoken="token = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :language="language" :language_code="language_code" />
     <div v-if="this.ready === true && this.show === true && this.sentences !== null">
       <Navigator v-if="this.sentences !== null" :sentences="sentences" :token="token" @settoken="token = $event" :user="user" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" @fetch="fetch" @sendonly="sendonly" :language_code="language_code" />
       <Login v-if="this.sentences !== null && ltoken === null" :sentences="sentences" :language="language" :language_code="language_code" :online="online" @fetch="fetch" @sendonly="sendonly" @setloading="loading = $event" @setltoken="ltoken = $event" />
@@ -29,9 +29,8 @@ import Navigator from '@/components/Navigator'
 import Footer from '@/components/Footer'
 import Loading from '@/components/Loading'
 import Login from '@/components/Login'
-import config from '@/lib/config.json'
 
-var crypto = require('crypto')
+import config from '@/lib/config.json'
 
 export default {
   name: 'App',
@@ -103,25 +102,14 @@ export default {
       }
       var i = 0
       var j = 0
-      var crc = null
       if (this.sequency === null) {
-        for (i = 0; obj.objects[i] !== undefined; i++) {
-          for (j in obj.objects[i].content) {
-            crc = crypto.createHash('md5').update(JSON.stringify(obj.objects[i].content[j])).digest('hex')
-            if (obj.objects[i].md5 === undefined) obj.objects[i].md5 = {}
-            obj.objects[i].md5[j] = crc
-          }
-        }
         this.sequency = obj.objects
       } else {
         for (i = 0; obj.objects[i] !== undefined; i++) {
           for (j = 0; this.sequency[j] !== undefined; j++) {
             if (this.sequency[j].alias === obj.objects[i].alias) {
               for (var k in obj.objects[i].content) {
-                crc = crypto.createHash('md5').update(JSON.stringify(obj.objects[i].content[k])).digest('hex')
-                // console.log(obj.objects[i].alias + '|' + k + ': ' + crc + '|' + obj.objects[i].md5[k])
                 this.sequency[j].content[k] = obj.objects[i].content[k]
-                this.sequency[j].md5[k] = crc
               }
             }
           }
@@ -140,7 +128,6 @@ export default {
       if (this.sentences !== null && this.sentences[this.$route.meta.alias] === undefined) {
         this.$refs.api.get_sentence(this.$route.meta.alias)
       }
-      // console.log(this.sequency)
       this.settitle()
     },
     setlanguage (nl) {
