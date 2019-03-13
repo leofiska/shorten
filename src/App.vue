@@ -118,10 +118,8 @@ export default {
           break
         }
       }
-      console.log('trick')
       this.show = false
       this.$nextTick(() => {
-        console.log('done')
         this.show = true
       })
       if (this.sentences !== null && this.sentences[this.$route.meta.alias] === undefined) {
