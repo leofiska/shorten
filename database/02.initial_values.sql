@@ -1,8 +1,11 @@
 --# ADDING LANGUAGES
 
+SELECT insert_sentences_page( 'ENGLISH_UNITED_STATES', 'LANGUAGES', '"1033"=>"English (United States)", "1046"=>"Inglês (Estados Unidos)"'::hstore );
+SELECT insert_sentences_page( 'PORTUGUESE_BRAZIL', 'LANGUAGES', '"1033"=>"Portuguese (Brazil)", "1046"=>"Português (Brasil)"'::hstore );
+
 INSERT INTO tb_languages ( language_codeset, language_code, language_wui, language_name ) VALUES 
-  ( '1033', 'en-us', true, '"1033"=>"English (United States)", "1046"=>"Inglês (Estados Unidos)"' ),
-  ( '1046', 'pt-br', true, '"1033"=>"Portuguese (Brazil)", "1046"=>"Português (Brasil)"' );
+  ( '1033', 'en-us', true, (SELECT sentence_id FROM tb_sentences WHERE sentence_alias='ENGLISH_UNITED_STATES') ),
+  ( '1046', 'pt-br', true, (SELECT sentence_id FROM tb_sentences WHERE sentence_alias='PORTUGUESE_BRAZIL') );
   
 --# ADDING COMMON SENTENCES
 SELECT insert_sentences ( 'CLICK_TO_EXPAND_OR_COLLAPSE', '"1033"=>"Click here to expand or collapse content", "1046"=>"Clique aqui para expandir ou comprimir o conteúdo"'::hstore );
