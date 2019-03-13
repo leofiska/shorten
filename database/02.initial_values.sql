@@ -140,7 +140,7 @@ SELECT insert_sentences_page( 'DEVELOPER', 'SIGNATURE', '"1033"=>"Developer", "1
 SELECT insert_sentences_page( 'PASSWORD', 'MY_ACCOUNT', '"1033"=>"Password", "1046"=>"Senha"'::hstore );
 SELECT insert_sentences_page( 'CHANGE_PASSWORD', 'MY_ACCOUNT', '"1033"=>"Change Password", "1046"=>"Alterar Senha"'::hstore );
 SELECT insert_sentences_page( 'ACCOUNT', 'MY_ACCOUNT', '"1033"=>"Account", "1046"=>"Conta"'::hstore );
-SELECT insert_sentences_page( 'USERNAME', 'MY_ACCOUNT', '"1033"=>"Username", "1046"=>"Nome du usuário"'::hstore );
+SELECT insert_sentences_page( 'USERNAME', 'MY_ACCOUNT', '"1033"=>"Username", "1046"=>"Nome do usuário"'::hstore );
 SELECT insert_sentences_page( 'ITEMS_PER_PAGE', 'MY_ACCOUNT', '"1033"=>"Items per page", "1046"=>"Items por página"'::hstore );
 SELECT insert_sentences_page( 'HIDE_ON_BLUR', 'MY_ACCOUNT', '"1033"=>"Hide when loses focus", "1046"=>"Esconder quando perder o foco"'::hstore );
 SELECT insert_sentences_page( 'PANIC_ACTION', 'MY_ACCOUNT', '"1033"=>"Hide on double click", "1046"=>"Esconder quando usar clique duplo"'::hstore );
@@ -148,6 +148,10 @@ SELECT insert_sentences_page( 'MY_ACCOUNT', 'MY_ACCOUNT', '"1033"=>"My Account",
 SELECT insert_sentences_page( 'USER_NOT_FOUND', 'MY_ACCOUNT', '"1033"=>"An account with the provided information was not found", "1046"=>"Uma conta com as informações providas não foi encontrada"'::hstore );
 SELECT insert_sentences_page( 'VALID_USERNAME', 'MY_ACCOUNT', '"1033"=>"The username must be at least 3 characters long and do not exceed 16 characters, containing only lowercase letters and numbers.", "1046"=>"O nome de usuário deve ter pelo menos 3 caracteres e não ultrapassar 16 caracteres, contendo apenas letras minúsculas e números."'::hstore );
 SELECT insert_sentences_page( 'INVALID_USERNAME', 'MY_ACCOUNT', '"1033"=>"The username is invalid, it must be at least 3 characters long and do not exceed 16 characters, containing only lowercase letters and numbers.", "1046"=>"O nome de usuário é inválido, ele deve ter pelo menos 3 caracteres e não ultrapassar 16 caracteres, contendo apenas letras minúsculas e números."'::hstore );
+SELECT insert_sentences_page( 'FIRSTNAME', 'MY_ACCOUNT', '"1033"=>"First Name", "1046"=>"Primeiro Nome"'::hstore );
+SELECT insert_sentences_page( 'LASTNAME', 'MY_ACCOUNT', '"1033"=>"Last Name", "1046"=>"Último Nome"'::hstore );
+SELECT insert_sentences_page( 'EMAIL', 'MY_ACCOUNT', '"1033"=>"Email", "1046"=>"E-mail"'::hstore );
+SELECT insert_sentences_page( 'PROFILE', 'MY_ACCOUNT', '"1033"=>"Profile", "1046"=>"Perfil"'::hstore );
 
 --# LOGIN PAGE
 SELECT insert_sentences_page( 'LOGIN_HELP', 'LOGIN', '"1033"=>"You may use your system account username or email as also as external domain accounts, if available. For external domain accounts please use the notation \"DOMAIN\\USER\" or \"USER@DOMAIN\".", "1046"=>"Você pode usar seu nome de usuário ou e-mail registrados no sistema, ou também contas de domínios externos. Para contas de domínios externos por favor use a notação \"DOMINIO\\USUARIO\" ou \"USUARIO@DOMINIO\"."'::hstore );
@@ -170,7 +174,18 @@ SELECT insert_sentences_page( 'FORGOT_PASSWORD', 'LOGIN', '"1033"=>"Forgot your 
 SELECT insert_sentences_page( 'LOGIN_ACCOUNT', 'LOGIN', '"1033"=>"Username/e-mail", "1046"=>"Usuário/e-mail"'::hstore );
 SELECT insert_sentences_page( 'PAGE_SIGNIN_LINE_1', 'LOGIN', '"1033"=>"Provide your access information to identify yourself in our system", "1046"=>"Preencha suas informações de acesso para se identificar em nosso sistema"'::hstore );
 SELECT insert_sentences_page( 'PAGE_SIGNUP_LINE_1', 'LOGIN', '"1033"=>"Fill the form below to register yourself, the temporary password will be sent to the provided e-mail", "1046"=>"Complete o formulário abaixo para se registrar, a senha temporária será enviada ao e-mail informado."'::hstore );
-SELECT insert_sentences_page( 'PAGE_SIGNUP_NO_NEW_SIGNUPS', 'LOGIN', '"1033"=>"The creation of new accounts are currently blocked, please provide your e-mail and the username you wish and you will be notified as soon as new accounts are available", "1046"=>"A criança de novas contas está temporariamente bloqueada, por favor informe seu e-mail e o nome de usuário que deseja reservar e assim que a criação estiver liberada entraremos em contato."'::hstore );
+SELECT insert_sentences_page( 'PAGE_SIGNUP_NO_NEW_SIGNUPS', 'LOGIN', '"1033"=>"The creation of new accounts are currently blocked, please provide your e-mail and the username you wish and you will be notified as soon as new accounts are available", "1046"=>"A criação de novas contas está temporariamente bloqueada, por favor informe seu e-mail e o nome de usuário que deseja reservar e assim que a criação estiver liberada entraremos em contato."'::hstore );
+SELECT insert_sentences_page( 'CLOSE', 'LOGIN', '"1033"=>"Close", "1046"=>"Fechar"'::hstore );
+SELECT insert_sentences_page( 'KEEP', 'LOGIN', '"1033"=>"keep signed", "1046"=>"manter conectado"'::hstore );
+SELECT insert_sentences_page( 'SUCCESS', 'LOGIN', '"1033"=>"user found!!", "1046"=>"usuário encontrado!!"'::hstore );
+SELECT insert_sentences_page( 'E404', 'LOGIN', '"1033"=>"user not found or invalid password", "1046"=>"usuário não encontrado ou senha inválida"'::hstore );
+SELECT insert_sentences_page( 'ONETIMEPASSCODE', 'LOGIN', '"1033"=>"Click here to receive a one time login passcode in your email", "1046"=>"Clique aqui para receber um código para login de uso único no seu e-mail"'::hstore );
+SELECT insert_sentences_page( 'PASSWORDMODE', 'LOGIN', '"1033"=>"Click here to use your password to login", "1046"=>"Use sua senha para fazer login"'::hstore );
+SELECT insert_sentences_page( 'PASSCODE', 'LOGIN', '"1033"=>"onetime passcode", "1046"=>"código de uso único"'::hstore );
+SELECT insert_sentences_page( 'REQUEST_PASSCODE', 'LOGIN', '"1033"=>"request passcode", "1046"=>"requisitar código de login"'::hstore );
+SELECT insert_sentences_page( 'REQUESTED_PASSCODE', 'LOGIN', '"1033"=>"login passcode sent to your registered e-mail, if found", "1046"=>"código de login temporário enviado ao seu e-mail registrado, se encontrado"'::hstore );
+
+
 
 --# RECOVER PASSWORD PAGE
 SELECT insert_sentences_page( 'RECOVER_PASSWORD_MESSAGE_1', 'RECOVER_PASSWORD', '"1033"=>"You forgot your password, it happens! We will help you generate a new one.", "1046"=>"Você esqueceu sua senha, acontece! Vamos ajudá-lo a criar uma nova."'::hstore );

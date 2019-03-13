@@ -1,11 +1,11 @@
 <template>
   <div>
-    <h2 v-if="this.user !== null" >{{s.profile}}: {{this.user.username}}</h2>
+    <h2 v-if="this.sentences !== null && this.sentences.my_account !== undefined && this.user !== null" >{{sentences.my_account.profile}}: {{this.user.username}}</h2>
     <br />
     <b-container v-if="this.user !== null">
       <b-row>
         <b-col md="6" class="text-right">
-          {{this.s.username}} :
+          {{this.sentences.my_account.username}} :
         </b-col>
         <b-col md="6" class="text-left">
           {{this.user.username}}
@@ -13,7 +13,7 @@
       </b-row>
       <b-row>
         <b-col md="6" class="text-right">
-          {{this.s.email}} :
+          {{this.sentences.my_account.email}} :
         </b-col>
         <b-col md="6" class="text-left">
           {{this.user.email}}
@@ -21,7 +21,7 @@
       </b-row>
       <b-row>
         <b-col md="6" class="text-right">
-          {{this.s.firstname}} :
+          {{this.sentences.my_account.firstname}} :
         </b-col>
         <b-col md="6" class="text-left">
           {{this.user.firstname}}
@@ -29,7 +29,7 @@
       </b-row>
       <b-row>
         <b-col md="6" class="text-right">
-          {{this.s.lastname}} :
+          {{this.sentences.my_account.lastname}} :
         </b-col>
         <b-col md="6" class="text-left">
           {{this.user.lastname}}
@@ -37,7 +37,7 @@
       </b-row>
       <b-row>
         <b-col md="6" class="text-right">
-          {{this.s.itemsperpage}} :
+          {{this.sentences.my_account.items_per_page}} :
         </b-col>
         <b-col md="6" class="text-left">
           <b-form-select :options="page_options" v-model="user.attributes.items_per_page" />
@@ -58,39 +58,6 @@ export default {
         20,
         50
       ],
-      sentences: [
-        {
-          alias: 'en-us',
-          content:
-          {
-
-            clear_tooltip: 'clears all',
-            email: 'email',
-            firstname: 'first name',
-            fullname: 'fullname',
-            itemsperpage: 'items per page',
-            lastname: 'last name',
-            profile: 'Profile',
-            username: 'username'
-          }
-        },
-        {
-          alias: 'pt-br',
-          content:
-          {
-            clear_tooltip: 'limpar tudo',
-            email: 'e-mail',
-            firstname: 'primeiro nome',
-            fullname: 'nome',
-            itemsperpage: 'itens por página',
-            lastname: 'sobrenome',
-            profile: 'Perfil',
-            username: 'nome do usuário'
-          }
-        }
-      ],
-      s: {
-      },
       items: { tid: -1, elements: [] }
     }
   },
@@ -98,35 +65,15 @@ export default {
     'title',
     'language',
     'language_code',
-    'user'
+    'user',
+    'sentences'
   ],
-  mounted () {
-    document.title = this.s.profile + ' | ' + this.title[this.language_code]
-  },
-  created () {
-    for (var i = 0; this.sentences[i] !== undefined; i++) {
-      if (this.sentences[i].alias === this.language) {
-        this.s = this.sentences[i].content
-        return
-      }
-    }
-    this.s = this.sentences[0].content
-  },
   methods: {
     storno (obj) {
       this.$emit('setloading', false)
     }
   },
   watch: {
-    language: function (newVal, oldVal) {
-      for (var i = 0; this.sentences[i] !== undefined; i++) {
-        if (this.sentences[i].alias === newVal) {
-          this.s = this.sentences[i].content
-          break
-        }
-      }
-      document.title = this.s.profile + ' | ' + this.title[this.language_code]
-    },
     'user.attributes.items_per_page': function (newVal, oldVal) {
       if (oldVal === undefined || newVal === undefined) return
       if (newVal === oldVal) return

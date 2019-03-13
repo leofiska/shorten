@@ -1,21 +1,21 @@
 <template>
-  <b-modal hide-footer id="login" :title="s.signin">
+  <b-modal v-if="this.sentences !== null && this.sentences.login !== undefined" hide-footer id="login" :title="this.sentences.login.signin">
     <b-form @submit="onSubmit">
-      <b-form-group :label="s.email + ':'" label-for="email">
-        <b-form-input id="email" type="email" v-model="email" required :placeholder="s.email"></b-form-input>
+      <b-form-group :label="sentences.login.email + ':'" label-for="email">
+        <b-form-input id="email" type="email" v-model="email" required :placeholder="sentences.login.email"></b-form-input>
       </b-form-group>
-      <b-form-group v-if="this.onetimepasscode === false" :label="s.password + ':'" label-for="password">
+      <b-form-group v-if="this.onetimepasscode === false" :label="sentences.login.password + ':'" label-for="password">
         <b-form-input id="password" type="password" v-model="password" required></b-form-input>
       </b-form-group>
-      <b-form-group v-else :label="this.s.passcode + ':'" label-for="passcode">
+      <b-form-group v-else :label="this.sentences.login.passcode + ':'" label-for="passcode">
         <b-form-input id="passcode" type="password" v-model="passcode" required></b-form-input>
       </b-form-group>
        <b-form-checkbox-group v-model="keep">
-          <b-form-checkbox>{{s.keep}}</b-form-checkbox>
+          <b-form-checkbox>{{sentences.login.keep}}</b-form-checkbox>
         </b-form-checkbox-group>
       <br />
-      <span v-if="this.onetimepasscode === false" class='link' @click="this.enableOnetimepasscodeMode">{{this.s.onetimepasscode}}</span>
-      <span v-else class='link' @click="this.enablePasswordMode">{{this.s.passwordmode}}</span>
+      <span v-if="this.onetimepasscode === false" class='link' @click="this.enableOnetimepasscodeMode">{{this.sentences.login.onetimepasscode}}</span>
+      <span v-else class='link' @click="this.enablePasswordMode">{{this.sentences.login.passwordmode}}</span>
       <div class='position-relative text-center' style='min-height: 8rem;'>
         <b-alert style='color: #721c24;' :show="!this.success && this.dismissCountDown"
           fade
@@ -34,13 +34,13 @@
       </div>
       <div>
         <p class='text-right'>
-          <b-button type="submit" variant="primary">{{s.signin}}</b-button>
-          <b-button type="button" variant="secondary" @click.prevent="clear">{{s.clear}}</b-button>
-          <b-button type="button" variant="danger" @click.prevent="hide">{{s.close}}</b-button>
+          <b-button type="submit" variant="primary">{{sentences.login.signin}}</b-button>
+          <b-button type="button" variant="secondary" @click.prevent="clear">{{sentences.login.clear}}</b-button>
+          <b-button type="button" variant="danger" @click.prevent="hide">{{sentences.login.close}}</b-button>
         </p>
         <p class='text-right'>
-          <b-button v-if="this.onetimepasscode === true && this.requestPasscodeCountdown === 0" type="button" @click.prevent="requestPasscode" variant="primary">{{s.request_passcode}}</b-button>
-          <b-button v-if="this.onetimepasscode === true && this.requestPasscodeCountdown !== 0" :disabled="true" type="button" variant="primary">{{s.request_passcode}} ({{this.requestPasscodeCountdown}})</b-button>
+          <b-button v-if="this.onetimepasscode === true && this.requestPasscodeCountdown === 0" type="button" @click.prevent="requestPasscode" variant="primary">{{sentences.login.request_passcode}}</b-button>
+          <b-button v-if="this.onetimepasscode === true && this.requestPasscodeCountdown !== 0" :disabled="true" type="button" variant="primary">{{sentences.login.request_passcode}} ({{this.requestPasscodeCountdown}})</b-button>
         </p>
       </div>
     </b-form>
@@ -51,7 +51,10 @@ export default {
   name: 'loading',
   props: [
     'online',
-    'language'
+    'language',
+    'language_code',
+    'loading',
+    'sentences'
   ],
   data () {
     return {
@@ -65,61 +68,8 @@ export default {
       password: '',
       passcode: '',
       keep: true,
-      sentences: [
-        {
-          alias: 'en-us',
-          content:
-          {
-            clear: 'Clear',
-            close: 'Close',
-            keep: 'keep signed',
-            password: 'password',
-            email: 'email',
-            signin: 'Sign-In',
-            success: 'user found!!',
-            e404: 'user not found or invalid password',
-            onetimepasscode: 'Click here to receive a one time login passcode in your email',
-            passwordmode: 'Click here to use your password to login',
-            passcode: 'onetime passcode',
-            request_passcode: 'request passcode',
-            requested_passcode: 'login passcode sent to your registered e-mail, if found'
-          }
-        },
-        {
-          alias: 'pt-br',
-          content:
-          {
-            clear: 'Limpar',
-            close: 'Fechar',
-            keep: 'manter conectado',
-            password: 'senha',
-            email: 'e-mail',
-            signin: 'Entrar',
-            success: 'usuário encontrado!!',
-            e404: 'usuário não encontrado ou senha inválida',
-            onetimepasscode: 'Clique aqui para receber um código para login de uso único no seu e-mail',
-            passwordmode: 'Use sua senha para fazer login',
-            passcode: 'código de uso único',
-            request_passcode: 'requisitar código de login',
-            requested_passcode: 'código de login temporário enviado ao seu e-mail registrado, se encontrado'
-          }
-        }
-      ],
-      s: {
-      },
       items: { tid: -1, loading: true, elements: [] }
     }
-  },
-  mounted () {
-  },
-  created () {
-    for (var i = 0; this.sentences[i] !== undefined; i++) {
-      if (this.sentences[i].alias === this.language) {
-        this.s = this.sentences[i].content
-        return
-      }
-    }
-    this.s = this.sentences[0].content
   },
   methods: {
     onSubmit (evt) {
@@ -173,18 +123,18 @@ export default {
       this.$emit('setloading', false)
       switch (obj.f) {
         case 'request_passcode':
-          this.loginAnswer = this.s.requested_passcode
+          this.loginAnswer = this.sentences.login.requested_passcode
           this.dismissCountDown = this.dismissSecs
           break
         case 'login_password':
           if (obj.error !== false) {
             switch (obj.error) {
               case 404:
-                this.loginAnswer = this.s.e404
+                this.loginAnswer = this.sentences.login.e404
                 break
             }
           } else {
-            this.loginAnswer = this.s.success
+            this.loginAnswer = this.sentences.login.success
             this.success = true
             localStorage.removeItem('ltoken')
             sessionStorage.removeItem('ltoken')
@@ -198,16 +148,6 @@ export default {
           }
           this.dismissCountDown = this.dismissSecs
           break
-      }
-    }
-  },
-  watch: {
-    language: function (newVal, oldVal) {
-      for (var i = 0; this.sentences[i] !== undefined; i++) {
-        if (this.sentences[i].alias === newVal) {
-          this.s = this.sentences[i].content
-          break
-        }
       }
     }
   }

@@ -1,10 +1,10 @@
 <template>
-  <div>
-    <h2>{{title[this.language_code]}}</h2>
+  <div v-if="this.sentences !== null && this.sentences.about !== undefined">
+    <h2>{{this.title[this.language_code]}}</h2>
     <div class='container text-center text-md-left pt-5 mt-5'>
-      <p>{{s.description_1}}</p>
+      <p>{{this.sentences.about.about_description_1}}</p>
       <br />
-      <p>{{s.description_2}}</p>
+      <p>{{this.sentences.about.about_description_2}}</p>
     </div>
   </div>
 </template>
@@ -15,62 +15,20 @@ export default {
   name: 'home',
   data () {
     return {
-      sentences: [
-        {
-          alias: 'en-us',
-          content:
-          {
-            about: 'About',
-            description_1: 'The service has been started on November 19th, 2018 and it is totally free of charge with no ads and no tracking, as it should be provided forever',
-            description_2: 'Suggestions are welcome, please use the e-mail in the footer of the page. New features will continue to be implemented'
-          }
-        },
-        {
-          alias: 'pt-br',
-          content:
-          {
-            about: 'Sobre',
-            description_1: 'Este serviço foi iniciado em 19 de novembro de 2018 e é totalmente gratuito, livre de anúncios e rastreios, como deve permenecer para sempre',
-            description_2: 'Sugestões são bem-vindas!! Utilize o e-mail que está no rodapé da página para fazê-las. Novas facilidades continuarão a ser implementadas'
-          }
-        }
-      ],
-      s: {
-      }
     }
   },
   props: [
-    'title',
+    'language_code',
     'language',
-    'language_code'
+    'title',
+    'sentences'
   ],
-  mounted () {
-    document.title = this.s.about + ' | ' + this.title[this.language_code]
-  },
-  created () {
-    for (var i = 0; this.sentences[i] !== undefined; i++) {
-      if (this.sentences[i].alias === this.language) {
-        this.s = this.sentences[i].content
-        return
-      }
-    }
-    this.s = this.sentences[0].content
-  },
   methods: {
     storno (obj) {
       this.$emit('setloading', false)
     }
   },
   watch: {
-    language: function (newVal, oldVal) {
-      for (var i = 0; this.sentences[i] !== undefined; i++) {
-        if (this.sentences[i].alias === newVal) {
-          this.s = this.sentences[i].content
-          break
-        }
-      }
-      document.title = this.s.about + ' | ' + this.title[this.language_code]
-    }
   }
 }
 </script>

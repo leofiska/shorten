@@ -1,17 +1,17 @@
 <template>
   <div>
-    <h2>{{title[this.language_code]}}</h2>
-    <p>{{s.description}}</p>
+    <h2>{{this.title[this.language_code]}}</h2>
+    <p>{{this.sentences.home.description}}</p>
     <div class='container text-center text-md-left position-relative pt-5 mt-5'>
       <b-form @submit="onSubmit">
         <b-input-group>
-          <b-form-input v-model="original_url" :placeholder="s.type_url"></b-form-input>
+          <b-form-input v-model="original_url" :placeholder="this.sentences.home.type_url"></b-form-input>
           <b-input-group-append>
-            <b-button variant="outline-success" :disabled="!online || this.original_url.length < 4" type="submit">{{s.short}}</b-button>
+            <b-button variant="outline-success" :disabled="!online || this.original_url.length < 4" type="submit">{{this.sentences.home.short}}</b-button>
             <b-button v-if="this.original_url === ''" variant="outline-secondary" :disabled="true">
               <font-awesome-icon :icon="['fas', 'trash']" />
             </b-button>
-            <b-button v-else variant="outline-secondary" v-on:click.prevent="clear" v-b-tooltip="s.clear_tooltip">
+            <b-button v-else variant="outline-secondary" v-on:click.prevent="clear" v-b-tooltip="this.sentences.home.clear_tooltip">
               <font-awesome-icon :icon="['fas', 'trash']" />
             </b-button>
           </b-input-group-append>
@@ -25,19 +25,19 @@
                variant="transparent"
                @dismissed="NotFoundDismissCountDown=0"
                @dismiss-count-down="NotFoundCountDownChanged">
-          <p>{{s.invaliddomain}}</p>
+          <p>{{this.sentences.home.invaliddomain}}</p>
         </b-alert>
       </div>
     </div>
     <br /><br />
     <div class='container text-center text-md-left position-relative'>
       <b-input-group>
-        <b-form-input v-model="shorten_url" :placeholder="s.short_url" :readonly="true" :disabled="this.shorten_url === ''"></b-form-input>
+        <b-form-input v-model="shorten_url" :placeholder="this.sentences.home.short_url" :readonly="true" :disabled="this.shorten_url === ''"></b-form-input>
         <b-input-group-append>
           <b-button variant="outline-primary" v-if="this.shorten_url === ''" :disabled="true">
             <font-awesome-icon :icon="['fas', 'copy']" />
           </b-button>
-          <b-button variant="outline-primary" v-else v-clipboard="() => this.shorten_url" v-clipboard:success="clipboardSuccessHandler"  v-b-tooltip="s.copy_tooltip">
+          <b-button variant="outline-primary" v-else v-clipboard="() => this.shorten_url" v-clipboard:success="clipboardSuccessHandler"  v-b-tooltip="this.sentences.home.copy_tooltip">
             <font-awesome-icon :icon="['fas', 'copy']" />
           </b-button>
         </b-input-group-append>
@@ -50,7 +50,7 @@
                variant="transparent"
                @dismissed="dismissCountDown=0"
                @dismiss-count-down="countDownChanged">
-          <p>{{s.copied}}</p>
+          <p>{{this.sentences.home.copied}}</p>
         </b-alert>
       </div>
     </div>
@@ -68,65 +68,17 @@ export default {
       NotFoundDismissCountDown: 0,
       original_url: '',
       shorten_url: '',
-      sentences: [
-        {
-          alias: 'en-us',
-          content:
-          {
-            clear_tooltip: 'clears all',
-            copy_tooltip: 'copy short url to clipboard',
-            type_url: 'type url here',
-            shorten: 'Light URL Shortener',
-            url: 'URL',
-            short_url: 'Short URL',
-            short: 'Shorten URL',
-            description: 'simplify your links and share them easily',
-            copied: 'link copied',
-            invaliddomain: 'host/domain not found'
-          }
-        },
-        {
-          alias: 'pt-br',
-          content:
-          {
-            clear_tooltip: 'limpar tudo',
-            copy_tooltip: 'copia url simplificada para área de transferência',
-            type_url: 'digite aqui a url',
-            shorten: 'Light URL Shortener',
-            url: 'URL',
-            short_url: 'URL Simplificada',
-            short: 'Simplificar URL',
-            description: 'simplifique seus links e os compartilhe mais facilmente',
-            copied: 'link copiado',
-            invaliddomain: 'host/dominio não encontrado'
-          }
-        }
-      ],
-      s: {
-      },
       items: { tid: -1, loading: true, elements: [] }
     }
   },
   props: [
     'title',
-    'token',
     'loading',
     'online',
     'language',
-    'language_code'
+    'language_code',
+    'sentences'
   ],
-  mounted () {
-    document.title = this.title[this.language_code]
-  },
-  created () {
-    for (var i = 0; this.sentences[i] !== undefined; i++) {
-      if (this.sentences[i].alias === this.language) {
-        this.s = this.sentences[i].content
-        return
-      }
-    }
-    this.s = this.sentences[0].content
-  },
   methods: {
     onSubmit (evt) {
       evt.preventDefault()
@@ -167,15 +119,6 @@ export default {
   watch: {
     original_url: function (val, oldVal) {
       this.shorten_url = ''
-    },
-    language: function (newVal, oldVal) {
-      for (var i = 0; this.sentences[i] !== undefined; i++) {
-        if (this.sentences[i].alias === newVal) {
-          this.s = this.sentences[i].content
-          break
-        }
-      }
-      document.title = this.s.about + ' | ' + this.title[this.language_code]
     }
   }
 }
