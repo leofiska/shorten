@@ -140,21 +140,21 @@ SELECT insert_sentences_page( 'YOURS_TRULY', 'SIGNATURE', '"1033"=>"Yours truly"
 SELECT insert_sentences_page( 'DEVELOPER', 'SIGNATURE', '"1033"=>"Developer", "1046"=>"Desenvolvedor"'::hstore );
 
 --# MY ACCOUNT PAGE
-SELECT insert_sentences_page( 'PASSWORD', 'MY_ACCOUNT', '"1033"=>"Password", "1046"=>"Senha"'::hstore );
-SELECT insert_sentences_page( 'CHANGE_PASSWORD', 'MY_ACCOUNT', '"1033"=>"Change Password", "1046"=>"Alterar Senha"'::hstore );
-SELECT insert_sentences_page( 'ACCOUNT', 'MY_ACCOUNT', '"1033"=>"Account", "1046"=>"Conta"'::hstore );
-SELECT insert_sentences_page( 'USERNAME', 'MY_ACCOUNT', '"1033"=>"Username", "1046"=>"Nome do usuário"'::hstore );
-SELECT insert_sentences_page( 'ITEMS_PER_PAGE', 'MY_ACCOUNT', '"1033"=>"Items per page", "1046"=>"Items por página"'::hstore );
-SELECT insert_sentences_page( 'HIDE_ON_BLUR', 'MY_ACCOUNT', '"1033"=>"Hide when loses focus", "1046"=>"Esconder quando perder o foco"'::hstore );
-SELECT insert_sentences_page( 'PANIC_ACTION', 'MY_ACCOUNT', '"1033"=>"Hide on double click", "1046"=>"Esconder quando usar clique duplo"'::hstore );
-SELECT insert_sentences_page( 'MY_ACCOUNT', 'MY_ACCOUNT', '"1033"=>"My Account", "1046"=>"Minha Conta"'::hstore );
-SELECT insert_sentences_page( 'USER_NOT_FOUND', 'MY_ACCOUNT', '"1033"=>"An account with the provided information was not found", "1046"=>"Uma conta com as informações providas não foi encontrada"'::hstore );
-SELECT insert_sentences_page( 'VALID_USERNAME', 'MY_ACCOUNT', '"1033"=>"The username must be at least 3 characters long and do not exceed 16 characters, containing only lowercase letters and numbers.", "1046"=>"O nome de usuário deve ter pelo menos 3 caracteres e não ultrapassar 16 caracteres, contendo apenas letras minúsculas e números."'::hstore );
-SELECT insert_sentences_page( 'INVALID_USERNAME', 'MY_ACCOUNT', '"1033"=>"The username is invalid, it must be at least 3 characters long and do not exceed 16 characters, containing only lowercase letters and numbers.", "1046"=>"O nome de usuário é inválido, ele deve ter pelo menos 3 caracteres e não ultrapassar 16 caracteres, contendo apenas letras minúsculas e números."'::hstore );
-SELECT insert_sentences_page( 'FIRSTNAME', 'MY_ACCOUNT', '"1033"=>"First Name", "1046"=>"Primeiro Nome"'::hstore );
-SELECT insert_sentences_page( 'LASTNAME', 'MY_ACCOUNT', '"1033"=>"Last Name", "1046"=>"Último Nome"'::hstore );
-SELECT insert_sentences_page( 'EMAIL', 'MY_ACCOUNT', '"1033"=>"Email", "1046"=>"E-mail"'::hstore );
-SELECT insert_sentences_page( 'PROFILE', 'MY_ACCOUNT', '"1033"=>"Profile", "1046"=>"Perfil"'::hstore );
+SELECT insert_sentences_page( 'PASSWORD', 'PROFILE', '"1033"=>"Password", "1046"=>"Senha"'::hstore );
+SELECT insert_sentences_page( 'CHANGE_PASSWORD', 'PROFILE', '"1033"=>"Change Password", "1046"=>"Alterar Senha"'::hstore );
+SELECT insert_sentences_page( 'ACCOUNT', 'PROFILE', '"1033"=>"Account", "1046"=>"Conta"'::hstore );
+SELECT insert_sentences_page( 'USERNAME', 'PROFILE', '"1033"=>"Username", "1046"=>"Nome do usuário"'::hstore );
+SELECT insert_sentences_page( 'ITEMS_PER_PAGE', 'PROFILE', '"1033"=>"Items per page", "1046"=>"Items por página"'::hstore );
+SELECT insert_sentences_page( 'HIDE_ON_BLUR', 'PROFILE', '"1033"=>"Hide when loses focus", "1046"=>"Esconder quando perder o foco"'::hstore );
+SELECT insert_sentences_page( 'PANIC_ACTION', 'PROFILE', '"1033"=>"Hide on double click", "1046"=>"Esconder quando usar clique duplo"'::hstore );
+SELECT insert_sentences_page( 'PROFILE', 'PROFILE', '"1033"=>"My Account", "1046"=>"Minha Conta"'::hstore );
+SELECT insert_sentences_page( 'USER_NOT_FOUND', 'PROFILE', '"1033"=>"An account with the provided information was not found", "1046"=>"Uma conta com as informações providas não foi encontrada"'::hstore );
+SELECT insert_sentences_page( 'VALID_USERNAME', 'PROFILE', '"1033"=>"The username must be at least 3 characters long and do not exceed 16 characters, containing only lowercase letters and numbers.", "1046"=>"O nome de usuário deve ter pelo menos 3 caracteres e não ultrapassar 16 caracteres, contendo apenas letras minúsculas e números."'::hstore );
+SELECT insert_sentences_page( 'INVALID_USERNAME', 'PROFILE', '"1033"=>"The username is invalid, it must be at least 3 characters long and do not exceed 16 characters, containing only lowercase letters and numbers.", "1046"=>"O nome de usuário é inválido, ele deve ter pelo menos 3 caracteres e não ultrapassar 16 caracteres, contendo apenas letras minúsculas e números."'::hstore );
+SELECT insert_sentences_page( 'FIRSTNAME', 'PROFILE', '"1033"=>"First Name", "1046"=>"Primeiro Nome"'::hstore );
+SELECT insert_sentences_page( 'LASTNAME', 'PROFILE', '"1033"=>"Last Name", "1046"=>"Último Nome"'::hstore );
+SELECT insert_sentences_page( 'EMAIL', 'PROFILE', '"1033"=>"Email", "1046"=>"E-mail"'::hstore );
+SELECT insert_sentences_page( 'PROFILE', 'PROFILE', '"1033"=>"Profile", "1046"=>"Perfil"'::hstore );
 
 --# LOGIN PAGE
 SELECT insert_sentences_page( 'LOGIN_HELP', 'LOGIN', '"1033"=>"You may use your system account username or email as also as external domain accounts, if available. For external domain accounts please use the notation \"DOMAIN\\USER\" or \"USER@DOMAIN\".", "1046"=>"Você pode usar seu nome de usuário ou e-mail registrados no sistema, ou também contas de domínios externos. Para contas de domínios externos por favor use a notação \"DOMINIO\\USUARIO\" ou \"USUARIO@DOMINIO\"."'::hstore );
@@ -237,6 +237,22 @@ SELECT insert_sentences_page( 'ADD_USER', 'MANAGE_USERS', '"1033"=>"add user", "
 SELECT insert_sentences_page( 'ADD_USER_HELP', 'MANAGE_USERS', '"1033"=>"add a new local user in the system", "1046"=>"adicione um novo usuário local ao sistema"'::hstore );
 SELECT insert_sentences_page ( 'CLICK_TO_EXPAND_OR_COLLAPSE', 'MANAGE_USERS', '"1033"=>"Click here to expand or collapse content", "1046"=>"Clique aqui para expandir ou comprimir o conteúdo"'::hstore );
 
+--#COMMON
+SELECT insert_sentences_page( 'ADD', 'COMMON', '"1033"=>"Add", "1046"=>"Adicionar"'::hstore );
+SELECT insert_sentences_page( 'CLEAR', 'COMMON', '"1033"=>"Clear", "1046"=>"Limpar"'::hstore );
+SELECT insert_sentences_page( 'EDIT', 'COMMON', '"1033"=>"Edit", "1046"=>"Editar"'::hstore );
+SELECT insert_sentences_page( 'FILTER', 'COMMON', '"1033"=>"Filter", "1046"=>"Filtrar"'::hstore );
+SELECT insert_sentences_page( 'REGISTER', 'COMMON', '"1033"=>"Register", "1046"=>"Registrar"'::hstore );
+SELECT insert_sentences_page( 'TYPE_TO_FILTER', 'COMMON', '"1033"=>"type to filter", "1046"=>"digite para filtrar"'::hstore );
+SELECT insert_sentences_page( 'SORT', 'COMMON', '"1033"=>"Sort", "1046"=>"Ordenar"'::hstore );
+SELECT insert_sentences_page( 'GENERAL', 'COMMON', '"1033"=>"General", "1046"=>"Geral"'::hstore );
+SELECT insert_sentences_page( 'ITEMS_PER_PAGE', 'COMMON', '"1033"=>"", "1046"=>""'::hstore );
+SELECT insert_sentences_page( 'RESPONSIBLE', 'COMMON', '"1033"=>"Responsible", "1046"=>"Responsável"'::hstore );
+SELECT insert_sentences_page( 'RESPONSIBLES', 'COMMON', '"1033"=>"Responsibles", "1046"=>"Responsáveis"'::hstore );
+SELECT insert_sentences_page( 'CONFIRM', 'COMMON', '"1033"=>"Confirm", "1046"=>"Confirmar"'::hstore );
+SELECT insert_sentences_page( 'CANCEL', 'COMMON', '"1033"=>"Cancel", "1046"=>"Cancelar"'::hstore );
+SELECT insert_sentences_page( 'NAME', 'COMMON', '"1033"=>"Name", "1046"=>"Nome"'::hstore );
+SELECT insert_sentences_page( 'DESCRIPTION', 'COMMON', '"1033"=>"Description", "1046"=>"Descrição"'::hstore );
 
 --# FILTER SENTENCES
 SELECT insert_sentences_page( 'SEARCH', 'FILTER', '"1033"=>"Search", "1046"=>"Procurar"'::hstore );
@@ -277,6 +293,11 @@ SELECT insert_sentences_page( 'PROFILE', 'NAVIGATOR', '"1033"=>"Profile", "1046"
 SELECT insert_sentences_page( 'ACCOUNT', 'NAVIGATOR', '"1033"=>"Account", "1046"=>"Conta"'::hstore );
 SELECT insert_sentences_page( 'SIGNIN', 'NAVIGATOR', '"1033"=>"Sign-In", "1046"=>"Entrar"'::hstore );
 SELECT insert_sentences_page( 'SIGNOUT', 'NAVIGATOR', '"1033"=>"Sign-Out", "1046"=>"Sair"'::hstore );
+
+--# BOTTOM
+SELECT insert_sentences_page( 'LINKS', 'BOTTOM', '"1033"=>"Links", "1046"=>"Links"'::hstore );
+SELECT insert_sentences_page( 'LANGUAGE', 'BOTTOM', '"1033"=>"Language", "1046"=>"Idioma"'::hstore );
+SELECT insert_sentences_page( 'FOLLOW_ON_SOCIAL', 'BOTTOM', '"1033"=>"follow on social networks", "1046"=>"siga nas redes sociais"'::hstore );
 
 --# TASKS
 --#SELECT insert_task_status ( 'QUEUED', '"1033"=>"Queued", "1046"=>"Enfileirado"'::hstore );

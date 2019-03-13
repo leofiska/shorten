@@ -7,6 +7,7 @@
       <Loading v-if="this.loading" :loading="this.loading" :language="language" />
       <div id="app" v-if="(this.$route.meta.alwaysVisible || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions === undefined) || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions !== undefined && this.$route.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!this.$route.meta.requireAuth && ((user === null && this.$route.meta.guestOnly) || !this.$route.meta.guestOnly)))">
         <router-view v-if="this.sentences !== null && this.sentences[this.$route.meta.alias] !== undefined" @fetch="fetch" :sentences="sentences" @sendonly="sendonly" @subscribe="subscribe" @unsubscribe="unsubscribe" :user="user"  :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setltoken="ltoken = $event" @setloading="loading = $event"  :language="language" :language_code="language_code" />
+        <p v-else>{{this.local_sentences[0].content.nolanguage}}</p>
       </div>
       <div id="app" v-else>
         {{this.local_sentences[0].content.notallowed}}
@@ -61,7 +62,8 @@ export default {
           content:
           {
             notallowed: 'You don\'t have permission to access this page',
-            loading: 'Loading'
+            loading: 'Loading',
+            nolanguage: 'Language for this page could not be loaded'
           }
         },
         {
@@ -69,7 +71,8 @@ export default {
           content:
           {
             notallowed: 'Você não tem permissão para ver esta página',
-            loading: 'Carregando'
+            loading: 'Carregando',
+            nolanguage: 'Idioma não pode ser carregado para esta página'
           }
         }
       ],

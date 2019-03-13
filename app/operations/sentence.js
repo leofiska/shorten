@@ -14,7 +14,10 @@ async function exec (req, ws, obj) {
 
   switch(obj.module) {
     case 'basic':
-      ans = await sentences.get_sequency(['BOTTOM','MY_ACCOUNT','NAVIGATOR','ABOUT','HOME', 'LOGIN', 'LANGUAGES']);
+      ans = await sentences.get_sequency(['COMMON', 'BOTTOM','NAVIGATOR','LOGIN','LANGUAGES']);
+      break;
+    default:
+      ans = await sentences.get_sequency(obj.module);
       break;
   }
   ws.send(JSON.stringify(

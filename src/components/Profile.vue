@@ -1,11 +1,11 @@
 <template>
   <div>
-    <h2 v-if="this.sentences !== null && this.sentences.my_account !== undefined && this.user !== null" >{{sentences.my_account.profile}}: {{this.user.username}}</h2>
+    <h2 v-if="this.user !== null" >{{sentences.profile.profile}}: {{this.user.username}}</h2>
     <br />
     <b-container v-if="this.user !== null">
       <b-row>
         <b-col md="6" class="text-right">
-          {{this.sentences.my_account.username}} :
+          {{this.sentences.profile.username}} :
         </b-col>
         <b-col md="6" class="text-left">
           {{this.user.username}}
@@ -13,7 +13,7 @@
       </b-row>
       <b-row>
         <b-col md="6" class="text-right">
-          {{this.sentences.my_account.email}} :
+          {{this.sentences.profile.email}} :
         </b-col>
         <b-col md="6" class="text-left">
           {{this.user.email}}
@@ -21,7 +21,7 @@
       </b-row>
       <b-row>
         <b-col md="6" class="text-right">
-          {{this.sentences.my_account.firstname}} :
+          {{this.sentences.profile.firstname}} :
         </b-col>
         <b-col md="6" class="text-left">
           {{this.user.firstname}}
@@ -29,7 +29,7 @@
       </b-row>
       <b-row>
         <b-col md="6" class="text-right">
-          {{this.sentences.my_account.lastname}} :
+          {{this.sentences.profile.lastname}} :
         </b-col>
         <b-col md="6" class="text-left">
           {{this.user.lastname}}
@@ -37,7 +37,7 @@
       </b-row>
       <b-row>
         <b-col md="6" class="text-right">
-          {{this.sentences.my_account.items_per_page}} :
+          {{this.sentences.profile.items_per_page}} :
         </b-col>
         <b-col md="6" class="text-left">
           <b-form-select :options="page_options" v-model="user.attributes.items_per_page" />
