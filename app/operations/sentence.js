@@ -14,8 +14,7 @@ async function exec (req, ws, obj) {
 
   switch(obj.module) {
     case 'basic':
-      ans = await sentences.get_sequency(['BOTTOM','MY_ACCOUNT','NAVIGATOR','ABOUT','HOME', 'LOGIN']);
-      console.log(ans);
+      ans = await sentences.get_sequency(['BOTTOM','MY_ACCOUNT','NAVIGATOR','ABOUT','HOME', 'LOGIN', 'LANGUAGES']);
       break;
   }
   ws.send(JSON.stringify(
