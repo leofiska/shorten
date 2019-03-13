@@ -1,12 +1,12 @@
 <template>
   <div>
     <v-api ref='api' @fillSequency="fillSequency" :user="user" @setuser="setuser" :apiUrl="apiUrl" :id="id" @setid="id = $event" :token="token" @setready="ready = $event" @settoken="token = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :stoken="stoken" @setstoken="stoken = $event" :online="online" @setOnline="online = $event" :language="language" :language_code="language_code" />
-    <div v-if="this.ready === true && this.sentences !== null">
+    <div v-if="this.ready === true && this.show === true && this.sentences !== null">
       <Navigator v-if="this.sentences !== null" :sentences="sentences" :token="token" @settoken="token = $event" :user="user" :stoken="stoken" @setstoken="stoken = $event" :ltoken="ltoken" @setltoken="ltoken = $event" :online="online" :title="title" :menu="menu" :baseUrl="baseUrl" :language="language" @fetch="fetch" @sendonly="sendonly" :language_code="language_code" />
       <Login v-if="this.sentences !== null && ltoken === null" :sentences="sentences" :language="language" :language_code="language_code" :online="online" @fetch="fetch" @sendonly="sendonly" @setloading="loading = $event" @setltoken="ltoken = $event" />
       <Loading v-if="this.loading" :loading="this.loading" :language="language" />
-      <div id="app" v-if="this.sentences !== null && (this.$route.meta.alwaysVisible || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions === undefined) || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions !== undefined && this.$route.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!this.$route.meta.requireAuth && ((user === null && this.$route.meta.guestOnly) || !this.$route.meta.guestOnly)))">
-        <router-view @fetch="fetch" :sentences="sentences" @sendonly="sendonly" @subscribe="subscribe" @unsubscribe="unsubscribe" :user="user"  :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setltoken="ltoken = $event" @setloading="loading = $event"  :language="language" :language_code="language_code" />
+      <div id="app" v-if="(this.$route.meta.alwaysVisible || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions === undefined) || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions !== undefined && this.$route.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!this.$route.meta.requireAuth && ((user === null && this.$route.meta.guestOnly) || !this.$route.meta.guestOnly)))">
+        <router-view v-if="this.sentences !== null && this.sentences[this.$route.meta.alias] !== undefined" @fetch="fetch" :sentences="sentences" @sendonly="sendonly" @subscribe="subscribe" @unsubscribe="unsubscribe" :user="user"  :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setltoken="ltoken = $event" @setloading="loading = $event"  :language="language" :language_code="language_code" />
       </div>
       <div id="app" v-else>
         {{this.local_sentences[0].content.notallowed}}
@@ -35,6 +35,7 @@ export default {
   name: 'App',
   data () {
     return {
+      show: true,
       ready: false,
       baseUrl: config.baseUrl,
       apiUrl: config.apiUrl,
@@ -93,12 +94,33 @@ export default {
   },
   methods: {
     fillSequency (obj) {
-      this.sequency = obj.objects
-      for (var i = 0; this.sequency[i] !== undefined; i++) {
+      var i = 0
+      var j = 0
+      if (this.sequency === null) {
+        this.sequency = obj.objects
+      } else {
+        for (i = 0; obj.objects[i] !== undefined; i++) {
+          for (j = 0; this.sequency[j] !== undefined; j++) {
+            if (this.sequency[j].alias === obj.objects[i].alias) {
+              for (var k in obj.objects[i].content) {
+                this.sequency[j].content[k] = obj.objects[i].content[k]
+              }
+            }
+          }
+        }
+      }
+      for (i = 0; this.sequency[i] !== undefined; i++) {
         if (this.sequency[i].alias === this.language) {
           this.sentences = this.sequency[i].content
           break
         }
+      }
+      this.show = false
+      this.$nextTick(() => {
+        console.log('done')
+      })
+      if (this.sentences !== null && this.sentences[this.$route.meta.alias] === undefined) {
+        this.$refs.api.get_sentence(this.$route.meta.alias)
       }
       this.settitle()
     },
@@ -125,12 +147,6 @@ export default {
       if (this.$refs.api !== undefined) {
         this.loading = true
         this.$refs.api.fetch(request)
-      }
-    },
-    getsentences (request) {
-      if (this.$refs.api !== undefined) {
-        this.loading = true
-        this.$refs.api.getsentences(request)
       }
     },
     sendonly (request) {
@@ -180,9 +196,13 @@ export default {
         (this.$route.meta.requireAuth && this.user !== null && this.$route.meta.permissions !== undefined && this.$route.meta.permissions.filter(value => -1 !== this.user.permissions.indexOf(value)).length !== 0) ||
         (!this.$route.meta.requireAuth && ((this.user === null && this.$route.meta.guestOnly) || !this.$route.meta.guestOnly))
       ) {
+        if (this.sentences !== null && this.sentences[this.$route.meta.alias] === undefined) {
+          this.$refs.api.get_sentence(this.$route.meta.alias)
+        }
       } else {
         this.$router.push('/')
       }
+      
     },
     'ready': function () {
       /* eslint-disable */

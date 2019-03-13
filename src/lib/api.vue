@@ -173,6 +173,12 @@ export default {
       if (id === undefined || pass === undefined || id === '' || pass === '') return false
       this.send({ f: 'login', id: id, pass: pass })
     },
+    get_sentence: function (module) {
+      if (module === null || module === undefined) {
+        module = 'basic'
+      }
+      this.send({f: 'sentence', module: module})
+    },
     sendonly: function (request) {
       if (request.sync !== undefined) {
         if (request.sync.tid < 0) {
