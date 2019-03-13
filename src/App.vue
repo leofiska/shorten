@@ -94,6 +94,9 @@ export default {
   },
   methods: {
     fillSequency (obj) {
+      if (obj === null || obj === undefined || obj.objects === null || obj.objects === undefined) {
+        return
+      }
       var i = 0
       var j = 0
       if (this.sequency === null) {
@@ -115,9 +118,11 @@ export default {
           break
         }
       }
+      console.log('trick')
       this.show = false
       this.$nextTick(() => {
         console.log('done')
+        this.show = true
       })
       if (this.sentences !== null && this.sentences[this.$route.meta.alias] === undefined) {
         this.$refs.api.get_sentence(this.$route.meta.alias)
