@@ -63,7 +63,7 @@ export default {
           {
             notallowed: 'You don\'t have permission to access this page',
             loading: 'Loading',
-            nolanguage: 'Language for this page could not be loaded'
+            nolanguage: 'Loading languages for this page'
           }
         },
         {
@@ -72,7 +72,7 @@ export default {
           {
             notallowed: 'Você não tem permissão para ver esta página',
             loading: 'Carregando',
-            nolanguage: 'Idioma não pode ser carregado para esta página'
+            nolanguage: 'Carregando idiomas para esta página'
           }
         }
       ],
