@@ -5,7 +5,7 @@
     <b-navbar-brand v-else to="/">{{this.menu.alt}}</b-navbar-brand>
     <b-collapse is-nav id="nav_collapse">
       <b-navbar-nav>
-        <b-nav-item :to="item.path" v-for="item in routes" :key="item.path" :disabled="!online" v-if="(item.meta.isDisplayed === true && (item.meta.alwaysVisible || (item.meta.requireAuth && user !== null && item.meta.permissions === undefined) || (item.meta.requireAuth && user !== null && item.meta.permissions !== undefined && item.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!item.meta.requireAuth && ((user === null && item.meta.guestOnly) || !item.meta.guestOnly))))">{{sentences.navigator[item.alias]}}</b-nav-item>
+        <b-nav-item :to="item.path" v-for="item in routes" :key="item.path" :disabled="!online" v-if="item.meta.alias !== undefined && ((item.meta.isDisplayed === true && (item.meta.alwaysVisible || (item.meta.requireAuth && user !== null && item.meta.permissions === undefined) || (item.meta.requireAuth && user !== null && item.meta.permissions !== undefined && item.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!item.meta.requireAuth && ((user === null && item.meta.guestOnly) || !item.meta.guestOnly)))))">{{sentences.navigator[item.meta.alias]}}</b-nav-item>
       </b-navbar-nav>
       <b-navbar-nav class="ml-auto" v-if="ltoken">
         <b-nav-item-dropdown right :disabled="!online" :text="sentences.navigator.account">

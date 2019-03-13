@@ -72,8 +72,6 @@ export default {
           }
         }
       ],
-      s: {
-      },
       sentences: null,
       sequency: null
     }
@@ -102,6 +100,7 @@ export default {
           break
         }
       }
+      this.settitle()
     },
     setlanguage (nl) {
       this.language = nl
@@ -157,6 +156,13 @@ export default {
         this.language = this.user.language.code
         this.language_code = this.user.language.codeset
       }
+    },
+    settitle () {
+      if (this.$route.meta !== undefined && this.$route.meta.alias !== undefined) {
+        document.title = this.sentences.navigator[this.$route.meta.alias].toLowerCase() + ' | ' + this.title[this.language_code]
+      } else {
+        document.title = this.title[this.language_code]
+      }
     }
   },
   computed: {
@@ -166,6 +172,7 @@ export default {
   },
   watch: {
     '$route.path': function (newVal, oldVal) {
+      this.settitle()
       this.loading = false
       /* eslint-disable */
       if (this.$route.meta.alwaysVisible === true ||
