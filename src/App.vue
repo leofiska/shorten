@@ -196,6 +196,7 @@ export default {
     '$route.path': function (newVal, oldVal) {
       this.settitle()
       this.loading = false
+      window.scrollTo(0, 0)
       /* eslint-disable */
       if (this.$route.meta.alwaysVisible === true ||
         (this.$route.meta.requireAuth && this.user !== null && this.$route.meta.permissions === undefined) ||
