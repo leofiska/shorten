@@ -59,16 +59,6 @@ CREATE TABLE tb_config (
 );
 GRANT SELECT, INSERT, UPDATE, DELETE ON tb_config TO :var_user;
 
-DROP TABLE IF EXISTS tb_languages;
-CREATE TABLE tb_languages (
-  language_id                   smallserial PRIMARY KEY,
-  language_codeset              smallint NOT NULL UNIQUE,
-  language_code                 char(5) NOT NULL UNIQUE,
-  language_wui                  boolean NOT NULL DEFAULT false,
-  language_name                 hstore
-);
-GRANT SELECT, INSERT, UPDATE, DELETE ON tb_languages TO :var_user;
-
 DROP TABLE IF EXISTS tb_sentences_page;
 DROP TABLE IF EXISTS tb_sentences;
 CREATE TABLE tb_sentences (
@@ -87,6 +77,16 @@ CREATE TABLE tb_sentences_page (
   CONSTRAINT "tb_sentences_page_U1" UNIQUE ("sentence_page_alias", "sentence_page_sentence_id")
 );
 GRANT SELECT, INSERT, UPDATE, DELETE ON tb_sentences_page TO :var_user;
+
+DROP TABLE IF EXISTS tb_languages;
+CREATE TABLE tb_languages (
+  language_id                   smallserial PRIMARY KEY,
+  language_codeset              smallint NOT NULL UNIQUE,
+  language_code                 char(5) NOT NULL UNIQUE,
+  language_wui                  boolean NOT NULL DEFAULT false,
+  language_name                 bigint REFERENCES tb_sentences (sentence_id) ON DELETE RESTRICT,
+);
+GRANT SELECT, INSERT, UPDATE, DELETE ON tb_languages TO :var_user;
 
 DROP TABLE IF EXISTS tb_permissions;
 CREATE TABLE tb_permissions (
