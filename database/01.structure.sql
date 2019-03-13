@@ -84,7 +84,7 @@ CREATE TABLE tb_languages (
   language_codeset              smallint NOT NULL UNIQUE,
   language_code                 char(5) NOT NULL UNIQUE,
   language_wui                  boolean NOT NULL DEFAULT false,
-  language_name                 bigint REFERENCES tb_sentences (sentence_id) ON DELETE RESTRICT,
+  language_name                 bigint REFERENCES tb_sentences (sentence_id) ON DELETE RESTRICT
 );
 GRANT SELECT, INSERT, UPDATE, DELETE ON tb_languages TO :var_user;
 

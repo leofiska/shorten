@@ -8,7 +8,13 @@ module.exports = {
 };
 
 async function query (q) {
-  var client = await pool.connect()
+  var client = null;
+  try {
+    client = await pool.connect()
+  } catch (e) {
+    console.log(e);
+    return query(q);
+  }
   let res
   try {
     await client.query('BEGIN')
