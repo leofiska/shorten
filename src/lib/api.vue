@@ -7,8 +7,7 @@ export default {
     'ltoken',
     'online',
     'apiUrl',
-    'user',
-    'sequency'
+    'user'
   ],
   render () {
     return {

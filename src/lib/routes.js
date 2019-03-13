@@ -9,27 +9,27 @@ export default {
     {
       path: '/home',
       name: 'home',
-      alias: 'home',
       component: Home,
       meta:
       {
         alwaysVisible: true,
         requireAuth: false,
         guestOnly: false,
-        isDisplayed: true
+        isDisplayed: true,
+        alias: 'home'
       }
     },
     {
       path: '/about',
       name: 'about',
-      alias: 'about',
       component: About,
       meta:
       {
         alwaysVisible: true,
         requireAuth: false,
         guestOnly: false,
-        isDisplayed: true
+        isDisplayed: true,
+        alias: 'about'
       }
     },
     {
@@ -41,7 +41,8 @@ export default {
         alwaysVisible: true,
         requireAuth: true,
         guestOnly: false,
-        isDisplayed: false
+        isDisplayed: false,
+        alias: 'profile'
       }
     },
     {
