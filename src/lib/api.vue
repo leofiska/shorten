@@ -156,9 +156,13 @@ export default {
               return
             }
             for (i = 0; this.bindings.objects[i] !== undefined; i++) {
-              if (this.bindings.objects[i].sync.tid === obj.tid) {
+              if (this.bindings.objects[i].sync !== undefined && this.bindings.objects[i].sync.tid === obj.tid) {
+                // get storno for fetch
                 this.bindings.objects[i].storno(obj).bind(this.bindings.objects[i].context)
                 break
+              } else if (this.bindings.objects[i].tid === obj.tid) {
+                // get storno for request
+                this.bindings.objects[i].storno(obj).bind(this.bindings.objects[i])
               }
             }
             break
@@ -168,6 +172,7 @@ export default {
   },
   mounted () {
     this.createSocket()
+    setInterval(this.gcollector, 5000)
   },
   methods: {
     login: function (id, pass) {
@@ -209,6 +214,20 @@ export default {
         this.send({f: request.method, options: request.options})
       }
     },
+    request: function (request) {
+      if (this.online === false || this.bindings.lock === true) {
+        setTimeout(this.request.bind(this), 100, request)
+        return
+      }
+      if (request.context.tid === null) {
+        this.bindings.lock = true
+        request.context.tid = this.tid++
+        this.bindings.objects.push(request.context)
+        this.bindings.lock = false
+      }
+      request.tid = request.context.tid
+      this.send({ f: request.method, options: request.options, tid: request.tid })
+    },
     setlanguage: function (language, languageCode) {
       this.send({f: 'user', options: {f: 'setlanguage', language: language, language_code: languageCode}})
     },
@@ -243,7 +262,7 @@ export default {
       }
       this.bindings.lock = true
       for (var i = 0; this.bindings.objects[i] !== undefined; i++) {
-        if (this.bindings.objects[i].sync.tid === request.sync.tid) {
+        if (this.bindings.objects[i].sync !== undefined && this.bindings.objects[i].sync.tid === request.sync.tid) {
           this.bindings.objects[i] = null
           break
         }
@@ -255,6 +274,14 @@ export default {
       tmp = null
       this.bindings.lock = false
       this.send({ f: request.method, options: request.options, tid: request.sync.tid })
+    },
+    gcollector: function () {
+      if (this.online === false || this.bindings.lock === true) {
+        return
+      }
+      for (var i = 0; this.bindings.objects[i] !== undefined; i++) {
+        // console.log(this.bindings.objects[i])
+      }
     }
   },
   watch: {

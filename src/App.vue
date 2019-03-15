@@ -6,7 +6,7 @@
       <Login v-if="this.sentences !== null && ltoken === null" :sentences="sentences" :language="language" :language_code="language_code" :online="online" @fetch="fetch" @sendonly="sendonly" @setloading="loading = $event" @setltoken="ltoken = $event" />
       <Loading v-if="this.loading" :loading="this.loading" :language="language" />
       <div id="app" v-if="(this.$route.meta.alwaysVisible || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions === undefined) || (this.$route.meta.requireAuth && user !== null && this.$route.meta.permissions !== undefined && this.$route.meta.permissions.filter(value => -1 !== user.permissions.indexOf(value)).length !== 0) || (!this.$route.meta.requireAuth && ((user === null && this.$route.meta.guestOnly) || !this.$route.meta.guestOnly)))">
-        <router-view v-if="this.sentences !== null && this.sentences[this.$route.meta.alias] !== undefined" @fetch="fetch" :sentences="sentences" @sendonly="sendonly" @subscribe="subscribe" @unsubscribe="unsubscribe" :user="user"  :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setltoken="ltoken = $event" @setloading="loading = $event"  :language="language" :language_code="language_code" />
+        <router-view v-if="this.sentences !== null && this.sentences[this.$route.meta.alias] !== undefined" @fetch="fetch" @request="request" :sentences="sentences" @sendonly="sendonly" @subscribe="subscribe" @unsubscribe="unsubscribe" :user="user"  :title="title" :online="online" :id="id" :token="token" :stoken="stoken" :loading="this.loading" @setltoken="ltoken = $event" @setloading="loading = $event"  :language="language" :language_code="language_code" />
         <p v-else>{{this.local_sentences[0].content.nolanguage}}</p>
       </div>
       <div id="app" v-else>
@@ -153,6 +153,12 @@ export default {
       if (this.$refs.api !== undefined) {
         this.loading = true
         this.$refs.api.fetch(request)
+      }
+    },
+    request (request) {
+      if (this.$refs.api !== undefined) {
+        this.loading = true
+        this.$refs.api.request(request)
       }
     },
     sendonly (request) {
