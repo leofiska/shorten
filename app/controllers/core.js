@@ -77,11 +77,9 @@ function provide_vueresource( req, res ) {
   }
   console.log('requesting vue-resource: '+file);
   fs.exists(file, function(exists) {
-    console.log('epa1');
     if ( exists ) {
       provide_file( req, res, file );
     } else {
-      console.log('epa2');
       console.log('404');
       res.statusCode = 404;
       res.end();
@@ -118,7 +116,6 @@ function provide_faviconresource( req, res ) {
 };
 
 function provide_file( req, res, file ) {
-  console.log('here');
   var ext = path.extname(file).substr(1).toLowerCase();
   var mimeType = mime.getType(file);
   // force download
@@ -176,7 +173,6 @@ function provide_file( req, res, file ) {
     var bufferSize = 64*1024;
     if ( info.chunk < bufferSize ) bufferSize = info.chunk;
     try {
-      console.log('going');
       var stream = fs.createReadStream(file, { start: info.start, end: info.end, bufferSize: bufferSize });
       stream.on('open', function() {
         try {
