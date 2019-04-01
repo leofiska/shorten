@@ -16,6 +16,7 @@ var query_elements = 'user_id,'+
                   'user_lastname,'+
                   'user_fullname,'+
                   'user_groups,'+
+                  'user_hash,' +
                   'user_permissions_internal,'+
                   'user_permissions_external,'+
                   'user_permissions_trusted,'+
@@ -96,7 +97,7 @@ function create_obj (ws, row) {
     ws.user = { auth: {} };
   }
   ws.user.user_id = row.user_id;
-  ans.id = row.user_id;
+  ans.id = row.user_hash;
   ws.user.username = row.user_nickname;
   ans.username = row.user_nickname;
   ws.user.email = row.user_primaryemail;

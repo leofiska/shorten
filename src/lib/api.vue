@@ -36,7 +36,7 @@ export default {
           return
         }
         this.socket.onopen = () => {
-          if (this.sequency === null) {
+          if (this.sequency === null || this.sequency === undefined) {
             this.get_sentence('basic')
           }
           this.send({f: 'token', token: this.token, stoken: this.stoken}, true)
