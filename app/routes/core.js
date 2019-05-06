@@ -1,16 +1,12 @@
 'use strict';
-var express = require('express');
+var core = require('../controllers/core.js');
 
 module.exports = function(app) {
-  var core = require('../controllers/core.js');
-//    app.get(/\.(.+)$/, core.resource );
   app.get('/', core.vueresource );
+  app.get(/media\/.*/, core.resource );
   app.get(/static\/.*/, core.vueresource );
-  // app.get('/', express.static('../dist') );
-  // app.get(/static\/.*/, express.static('../dist') );
-  app.get('/media/:folder/:file', core.resource );
+  app.get(/favicons\/.*/, core.mediaresource );
+  app.get(/([^\/]+\.(html|css|js))/, core.resource );
   app.get(/([^\/]+\.(png|ico|xml|json))/, core.faviconresource );
-  app.get('/:shorten', core.redirect );
-  app.get(/(.*)/, core.vueresource );
-//  app.use(express.static('../dist'));
 };
+
