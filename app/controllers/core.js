@@ -78,12 +78,11 @@ function provide (req, res, base) {
     res.statusCode = 206;
   } else {
     res.setHeader('Content-length',info.total);
-    if (acceptEncoding.match(/\bdeflate\b/)) {
-      res.setHeader('Content-Encoding', 'deflate');
-    } else if (acceptEncoding.match(/\bgzip\b/)) {
+    if (acceptEncoding.match(/\bgzip\b/)) {
       res.setHeader('Content-Encoding', 'gzip');
+    } else if (acceptEncoding.match(/\bdeflate\b/)) {
+      res.setHeader('Content-Encoding', 'deflate');
     }
-
     switch(ext) {
       case 'html':
       case 'vtt':
@@ -105,10 +104,10 @@ function provide (req, res, base) {
   if ( info.chunk < bufferSize ) bufferSize = info.chunk;
   var raw = fs.createReadStream(file, { start: info.start, end: info.end, bufferSize: bufferSize });
   //var raw = fs.createReadStream(file, { start: info.start, end: info.end });
-  if (acceptEncoding.match(/\bdeflate\b/)) {
-    raw.pipe(zlib.createDeflate()).pipe(res);
-  } else if (acceptEncoding.match(/\bgzip\b/)) {
+  if (acceptEncoding.match(/\bgzip\b/)) {
     raw.pipe(zlib.createGzip()).pipe(res);
+  } else if (acceptEncoding.match(/\bdeflate\b/)) {
+    raw.pipe(zlib.createDeflate()).pipe(res);
   } else {
     raw.pipe(res);
   }
