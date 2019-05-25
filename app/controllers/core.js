@@ -5,6 +5,8 @@ var path = require('path');
 var mime = require('mime');
 var database = require(__dirname + '/../resource/database.js');
 var zlib = require('zlib');
+var uuid = require('short-uuid');
+var translator = uuid();
 
 const extensions = {
   loadInBrowser: [ 'image', 'video', 'text' ]
@@ -25,6 +27,34 @@ exports.faviconresource = ( req , res ) => {
 exports.resource = ( req , res ) => {
   return provide(req, res,'');
 }
+
+exports.redirect = async ( req, res ) => {
+  console.log('redirect: '+req.params.shorten);
+  try {
+    var query = 'SELECT short_id, short_url FROM tb_shortener WHERE short_uuid=\''+translator.toUUID(req.params.shorten)+'\' LIMIT 1';
+    console.log(query);
+    var ans = await database.query(query);
+    if (ans === null) {
+      res.statusCode = 500;
+      res.end();
+      return;
+    }
+    if (ans.rowCount !== 1) {
+      res.statusCode = 404;
+      res.end();
+      return;
+    }
+    query = 'UPDATE tb_shortener SET short_unique_counter = short_unique_counter + 1 WHERE short_id='+ans.rows[0].short_id;
+    await database.query(query);
+    res.writeHead(301, {
+      'Location': ans.rows[0].short_url
+    });
+  } catch (e) {
+    console.log('invalid redirect request: ' +req.params.shorten);
+    writeError(res, 404);
+  }
+  res.end();
+};
 
 function provide (req, res, base) {
   if (base === undefined) {
